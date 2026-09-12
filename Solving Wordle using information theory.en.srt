@@ -1,0 +1,9445 @@
+1
+00:00:00,000 --> 00:00:01,710
+
+The game Wordle has gone pretty viral in
+
+2
+00:00:01,710 --> 00:00:01,720
+The game Wordle has gone pretty viral in
+ 
+
+3
+00:00:01,720 --> 00:00:03,670
+The game Wordle has gone pretty viral in
+the last month or two, and never one to
+
+4
+00:00:03,670 --> 00:00:03,680
+the last month or two, and never one to
+ 
+
+5
+00:00:03,680 --> 00:00:05,150
+the last month or two, and never one to
+overlook an opportunity for a math
+
+6
+00:00:05,150 --> 00:00:05,160
+overlook an opportunity for a math
+ 
+
+7
+00:00:05,160 --> 00:00:06,750
+overlook an opportunity for a math
+lesson, it occurs to me that this game
+
+8
+00:00:06,750 --> 00:00:06,760
+lesson, it occurs to me that this game
+ 
+
+9
+00:00:06,760 --> 00:00:08,830
+lesson, it occurs to me that this game
+makes for a very good central example in
+
+10
+00:00:08,830 --> 00:00:08,840
+makes for a very good central example in
+ 
+
+11
+00:00:08,840 --> 00:00:10,870
+makes for a very good central example in
+a lesson about information theory, and
+
+12
+00:00:10,870 --> 00:00:10,880
+a lesson about information theory, and
+ 
+
+13
+00:00:10,880 --> 00:00:13,830
+a lesson about information theory, and
+in particular a topic known as entropy.
+
+14
+00:00:13,830 --> 00:00:13,840
+in particular a topic known as entropy.
+ 
+
+15
+00:00:13,840 --> 00:00:15,110
+in particular a topic known as entropy.
+You see, like a lot of people, I got
+
+16
+00:00:15,110 --> 00:00:15,120
+You see, like a lot of people, I got
+ 
+
+17
+00:00:15,120 --> 00:00:16,790
+You see, like a lot of people, I got
+kind of sucked into the puzzle, and like
+
+18
+00:00:16,790 --> 00:00:16,800
+kind of sucked into the puzzle, and like
+ 
+
+19
+00:00:16,800 --> 00:00:18,470
+kind of sucked into the puzzle, and like
+a lot of programmers, I also got sucked
+
+20
+00:00:18,470 --> 00:00:18,480
+a lot of programmers, I also got sucked
+ 
+
+21
+00:00:18,480 --> 00:00:20,470
+a lot of programmers, I also got sucked
+into trying to write an algorithm that
+
+22
+00:00:20,470 --> 00:00:20,480
+into trying to write an algorithm that
+ 
+
+23
+00:00:20,480 --> 00:00:22,350
+into trying to write an algorithm that
+would play the game as optimally as it
+
+24
+00:00:22,350 --> 00:00:22,360
+would play the game as optimally as it
+ 
+
+25
+00:00:22,360 --> 00:00:23,910
+would play the game as optimally as it
+could. And what I thought I'd do here is
+
+26
+00:00:23,910 --> 00:00:23,920
+could. And what I thought I'd do here is
+ 
+
+27
+00:00:23,920 --> 00:00:25,310
+could. And what I thought I'd do here is
+just talk through with you some of my
+
+28
+00:00:25,310 --> 00:00:25,320
+just talk through with you some of my
+ 
+
+29
+00:00:25,320 --> 00:00:27,030
+just talk through with you some of my
+process in that, and explain some of the
+
+30
+00:00:27,030 --> 00:00:27,040
+process in that, and explain some of the
+ 
+
+31
+00:00:27,040 --> 00:00:28,710
+process in that, and explain some of the
+math that went into it, since the whole
+
+32
+00:00:28,710 --> 00:00:28,720
+math that went into it, since the whole
+ 
+
+33
+00:00:28,720 --> 00:00:30,590
+math that went into it, since the whole
+algorithm centers on this idea of
+
+34
+00:00:30,590 --> 00:00:30,600
+algorithm centers on this idea of
+ 
+
+35
+00:00:30,600 --> 00:00:38,830
+algorithm centers on this idea of
+entropy.
+
+36
+00:00:38,830 --> 00:00:38,840
+
+ 
+
+37
+00:00:38,840 --> 00:00:40,230
+
+First things first, in case you haven't
+
+38
+00:00:40,230 --> 00:00:40,240
+First things first, in case you haven't
+ 
+
+39
+00:00:40,240 --> 00:00:42,470
+First things first, in case you haven't
+heard of it, what is Wordle? And to kill
+
+40
+00:00:42,470 --> 00:00:42,480
+heard of it, what is Wordle? And to kill
+ 
+
+41
+00:00:42,480 --> 00:00:43,910
+heard of it, what is Wordle? And to kill
+two birds with one stone here, while we
+
+42
+00:00:43,910 --> 00:00:43,920
+two birds with one stone here, while we
+ 
+
+43
+00:00:43,920 --> 00:00:45,430
+two birds with one stone here, while we
+go through the rules of the game, let me
+
+44
+00:00:45,430 --> 00:00:45,440
+go through the rules of the game, let me
+ 
+
+45
+00:00:45,440 --> 00:00:46,990
+go through the rules of the game, let me
+also preview where we're going with
+
+46
+00:00:46,990 --> 00:00:47,000
+also preview where we're going with
+ 
+
+47
+00:00:47,000 --> 00:00:48,510
+also preview where we're going with
+this, which is to develop a little
+
+48
+00:00:48,510 --> 00:00:48,520
+this, which is to develop a little
+ 
+
+49
+00:00:48,520 --> 00:00:50,150
+this, which is to develop a little
+algorithm that will basically play the
+
+50
+00:00:50,150 --> 00:00:50,160
+algorithm that will basically play the
+ 
+
+51
+00:00:50,160 --> 00:00:52,430
+algorithm that will basically play the
+game for us. So, I haven't done today's
+
+52
+00:00:52,430 --> 00:00:52,440
+game for us. So, I haven't done today's
+ 
+
+53
+00:00:52,440 --> 00:00:54,070
+game for us. So, I haven't done today's
+Wordle, this is February 4th, and we'll
+
+54
+00:00:54,070 --> 00:00:54,080
+Wordle, this is February 4th, and we'll
+ 
+
+55
+00:00:54,080 --> 00:00:56,270
+Wordle, this is February 4th, and we'll
+see how the bot does. The goal of Wordle
+
+56
+00:00:56,270 --> 00:00:56,280
+see how the bot does. The goal of Wordle
+ 
+
+57
+00:00:56,280 --> 00:00:58,510
+see how the bot does. The goal of Wordle
+is to guess a mystery five-letter word,
+
+58
+00:00:58,510 --> 00:00:58,520
+is to guess a mystery five-letter word,
+ 
+
+59
+00:00:58,520 --> 00:00:59,870
+is to guess a mystery five-letter word,
+and you're given six different chances
+
+60
+00:00:59,870 --> 00:00:59,880
+and you're given six different chances
+ 
+
+61
+00:00:59,880 --> 00:01:01,870
+and you're given six different chances
+to guess. For example, my Wordle bot
+
+62
+00:01:01,870 --> 00:01:01,880
+to guess. For example, my Wordle bot
+ 
+
+63
+00:01:01,880 --> 00:01:03,830
+to guess. For example, my Wordle bot
+suggests that I start with the guess
+
+64
+00:01:03,830 --> 00:01:03,840
+suggests that I start with the guess
+ 
+
+65
+00:01:03,840 --> 00:01:06,710
+suggests that I start with the guess
+crane. Each time that you make a guess,
+
+66
+00:01:06,710 --> 00:01:06,720
+crane. Each time that you make a guess,
+ 
+
+67
+00:01:06,720 --> 00:01:08,550
+crane. Each time that you make a guess,
+you get some information about how close
+
+68
+00:01:08,550 --> 00:01:08,560
+you get some information about how close
+ 
+
+69
+00:01:08,560 --> 00:01:10,910
+you get some information about how close
+your guess is to the true answer. Here,
+
+70
+00:01:10,910 --> 00:01:10,920
+your guess is to the true answer. Here,
+ 
+
+71
+00:01:10,920 --> 00:01:12,990
+your guess is to the true answer. Here,
+the gray box is telling me there's no C
+
+72
+00:01:12,990 --> 00:01:13,000
+the gray box is telling me there's no C
+ 
+
+73
+00:01:13,000 --> 00:01:15,030
+the gray box is telling me there's no C
+in the actual answer. The yellow box is
+
+74
+00:01:15,030 --> 00:01:15,040
+in the actual answer. The yellow box is
+ 
+
+75
+00:01:15,040 --> 00:01:17,030
+in the actual answer. The yellow box is
+telling me there is an R, but it's not
+
+76
+00:01:17,030 --> 00:01:17,040
+telling me there is an R, but it's not
+ 
+
+77
+00:01:17,040 --> 00:01:18,790
+telling me there is an R, but it's not
+in that position. The green box is
+
+78
+00:01:18,790 --> 00:01:18,800
+in that position. The green box is
+ 
+
+79
+00:01:18,800 --> 00:01:20,270
+in that position. The green box is
+telling me that the secret word does
+
+80
+00:01:20,270 --> 00:01:20,280
+telling me that the secret word does
+ 
+
+81
+00:01:20,280 --> 00:01:21,710
+telling me that the secret word does
+have an A, and it's in the third
+
+82
+00:01:21,710 --> 00:01:21,720
+have an A, and it's in the third
+ 
+
+83
+00:01:21,720 --> 00:01:23,750
+have an A, and it's in the third
+position. And then there's no N, and
+
+84
+00:01:23,750 --> 00:01:23,760
+position. And then there's no N, and
+ 
+
+85
+00:01:23,760 --> 00:01:25,910
+position. And then there's no N, and
+there's no E. So, let me just go in and
+
+86
+00:01:25,910 --> 00:01:25,920
+there's no E. So, let me just go in and
+ 
+
+87
+00:01:25,920 --> 00:01:27,390
+there's no E. So, let me just go in and
+tell the Wordle bot that information. We
+
+88
+00:01:27,390 --> 00:01:27,400
+tell the Wordle bot that information. We
+ 
+
+89
+00:01:27,400 --> 00:01:29,310
+tell the Wordle bot that information. We
+started with crane, we got gray, yellow,
+
+90
+00:01:29,310 --> 00:01:29,320
+started with crane, we got gray, yellow,
+ 
+
+91
+00:01:29,320 --> 00:01:31,270
+started with crane, we got gray, yellow,
+green, gray, gray.
+
+92
+00:01:31,270 --> 00:01:31,280
+green, gray, gray.
+ 
+
+93
+00:01:31,280 --> 00:01:32,630
+green, gray, gray.
+Don't worry about all the data that it's
+
+94
+00:01:32,630 --> 00:01:32,640
+Don't worry about all the data that it's
+ 
+
+95
+00:01:32,640 --> 00:01:34,230
+Don't worry about all the data that it's
+showing right now, I'll explain that in
+
+96
+00:01:34,230 --> 00:01:34,240
+showing right now, I'll explain that in
+ 
+
+97
+00:01:34,240 --> 00:01:36,670
+showing right now, I'll explain that in
+due time, but it's top suggestion for
+
+98
+00:01:36,670 --> 00:01:36,680
+due time, but it's top suggestion for
+ 
+
+99
+00:01:36,680 --> 00:01:39,950
+due time, but it's top suggestion for
+our second pick is stick. And your guess
+
+100
+00:01:39,950 --> 00:01:39,960
+our second pick is stick. And your guess
+ 
+
+101
+00:01:39,960 --> 00:01:41,710
+our second pick is stick. And your guess
+does have to be an actual five-letter
+
+102
+00:01:41,710 --> 00:01:41,720
+does have to be an actual five-letter
+ 
+
+103
+00:01:41,720 --> 00:01:43,470
+does have to be an actual five-letter
+word, but as you'll see, it's pretty
+
+104
+00:01:43,470 --> 00:01:43,480
+word, but as you'll see, it's pretty
+ 
+
+105
+00:01:43,480 --> 00:01:44,870
+word, but as you'll see, it's pretty
+liberal with what it will actually let
+
+106
+00:01:44,870 --> 00:01:44,880
+liberal with what it will actually let
+ 
+
+107
+00:01:44,880 --> 00:01:46,110
+liberal with what it will actually let
+you guess.
+
+108
+00:01:46,110 --> 00:01:46,120
+you guess.
+ 
+
+109
+00:01:46,120 --> 00:01:48,550
+you guess.
+In this case, we try stick.
+
+110
+00:01:48,550 --> 00:01:48,560
+In this case, we try stick.
+ 
+
+111
+00:01:48,560 --> 00:01:49,910
+In this case, we try stick.
+And all right, things are looking pretty
+
+112
+00:01:49,910 --> 00:01:49,920
+And all right, things are looking pretty
+ 
+
+113
+00:01:49,920 --> 00:01:52,070
+And all right, things are looking pretty
+good. We hit the S and the H, so we know
+
+114
+00:01:52,070 --> 00:01:52,080
+good. We hit the S and the H, so we know
+ 
+
+115
+00:01:52,080 --> 00:01:53,270
+good. We hit the S and the H, so we know
+the first three letters, we know that
+
+116
+00:01:53,270 --> 00:01:53,280
+the first three letters, we know that
+ 
+
+117
+00:01:53,280 --> 00:01:55,070
+the first three letters, we know that
+there's an R. And so, it's going to be
+
+118
+00:01:55,070 --> 00:01:55,080
+there's an R. And so, it's going to be
+ 
+
+119
+00:01:55,080 --> 00:01:58,230
+there's an R. And so, it's going to be
+like S H A something R, or S H A R
+
+120
+00:01:58,230 --> 00:01:58,240
+like S H A something R, or S H A R
+ 
+
+121
+00:01:58,240 --> 00:01:59,390
+like S H A something R, or S H A R
+something.
+
+122
+00:01:59,390 --> 00:01:59,400
+something.
+ 
+
+123
+00:01:59,400 --> 00:02:01,150
+something.
+And it looks like the Wordle bot knows
+
+124
+00:02:01,150 --> 00:02:01,160
+And it looks like the Wordle bot knows
+ 
+
+125
+00:02:01,160 --> 00:02:02,190
+And it looks like the Wordle bot knows
+that it's down to just two
+
+126
+00:02:02,190 --> 00:02:02,200
+that it's down to just two
+ 
+
+127
+00:02:02,200 --> 00:02:04,990
+that it's down to just two
+possibilities, either shard or sharp.
+
+128
+00:02:04,990 --> 00:02:05,000
+possibilities, either shard or sharp.
+ 
+
+129
+00:02:05,000 --> 00:02:06,430
+possibilities, either shard or sharp.
+Now, it's kind of a toss-up between them
+
+130
+00:02:06,430 --> 00:02:06,440
+Now, it's kind of a toss-up between them
+ 
+
+131
+00:02:06,440 --> 00:02:08,310
+Now, it's kind of a toss-up between them
+at this point, so I guess probably just
+
+132
+00:02:08,310 --> 00:02:08,320
+at this point, so I guess probably just
+ 
+
+133
+00:02:08,320 --> 00:02:09,550
+at this point, so I guess probably just
+cuz it's alphabetical it goes with
+
+134
+00:02:09,550 --> 00:02:09,560
+cuz it's alphabetical it goes with
+ 
+
+135
+00:02:09,560 --> 00:02:11,070
+cuz it's alphabetical it goes with
+shard.
+
+136
+00:02:11,070 --> 00:02:11,080
+shard.
+ 
+
+137
+00:02:11,080 --> 00:02:12,949
+shard.
+Which, hooray, is the actual answer. So,
+
+138
+00:02:12,949 --> 00:02:12,959
+Which, hooray, is the actual answer. So,
+ 
+
+139
+00:02:12,959 --> 00:02:14,510
+Which, hooray, is the actual answer. So,
+we got it in three.
+
+140
+00:02:14,510 --> 00:02:14,520
+we got it in three.
+ 
+
+141
+00:02:14,520 --> 00:02:15,830
+we got it in three.
+If you're wondering if that's any good,
+
+142
+00:02:15,830 --> 00:02:15,840
+If you're wondering if that's any good,
+ 
+
+143
+00:02:15,840 --> 00:02:17,390
+If you're wondering if that's any good,
+the way I heard one person phrase it is
+
+144
+00:02:17,390 --> 00:02:17,400
+the way I heard one person phrase it is
+ 
+
+145
+00:02:17,400 --> 00:02:19,630
+the way I heard one person phrase it is
+that with Wordle four is par and three
+
+146
+00:02:19,630 --> 00:02:19,640
+that with Wordle four is par and three
+ 
+
+147
+00:02:19,640 --> 00:02:21,949
+that with Wordle four is par and three
+is birdie. Which I think is a pretty apt
+
+148
+00:02:21,949 --> 00:02:21,959
+is birdie. Which I think is a pretty apt
+ 
+
+149
+00:02:21,959 --> 00:02:24,190
+is birdie. Which I think is a pretty apt
+analogy. You have to be consistently on
+
+150
+00:02:24,190 --> 00:02:24,200
+analogy. You have to be consistently on
+ 
+
+151
+00:02:24,200 --> 00:02:25,990
+analogy. You have to be consistently on
+your game to be getting four, but it's
+
+152
+00:02:25,990 --> 00:02:26,000
+your game to be getting four, but it's
+ 
+
+153
+00:02:26,000 --> 00:02:28,030
+your game to be getting four, but it's
+certainly not crazy. But, when you get
+
+154
+00:02:28,030 --> 00:02:28,040
+certainly not crazy. But, when you get
+ 
+
+155
+00:02:28,040 --> 00:02:30,750
+certainly not crazy. But, when you get
+it in three, it just feels great.
+
+156
+00:02:30,750 --> 00:02:30,760
+it in three, it just feels great.
+ 
+
+157
+00:02:30,760 --> 00:02:31,830
+it in three, it just feels great.
+So, if you're down for it, what I'd like
+
+158
+00:02:31,830 --> 00:02:31,840
+So, if you're down for it, what I'd like
+ 
+
+159
+00:02:31,840 --> 00:02:33,110
+So, if you're down for it, what I'd like
+to do here is just talk through my
+
+160
+00:02:33,110 --> 00:02:33,120
+to do here is just talk through my
+ 
+
+161
+00:02:33,120 --> 00:02:34,710
+to do here is just talk through my
+thought process from the beginning for
+
+162
+00:02:34,710 --> 00:02:34,720
+thought process from the beginning for
+ 
+
+163
+00:02:34,720 --> 00:02:36,830
+thought process from the beginning for
+how I approach the Wordle bot. And like
+
+164
+00:02:36,830 --> 00:02:36,840
+how I approach the Wordle bot. And like
+ 
+
+165
+00:02:36,840 --> 00:02:38,150
+how I approach the Wordle bot. And like
+I said, really it's an excuse for an
+
+166
+00:02:38,150 --> 00:02:38,160
+I said, really it's an excuse for an
+ 
+
+167
+00:02:38,160 --> 00:02:40,070
+I said, really it's an excuse for an
+information theory lesson. The main goal
+
+168
+00:02:40,070 --> 00:02:40,080
+information theory lesson. The main goal
+ 
+
+169
+00:02:40,080 --> 00:02:41,990
+information theory lesson. The main goal
+is to explain what is information and
+
+170
+00:02:41,990 --> 00:02:42,000
+is to explain what is information and
+ 
+
+171
+00:02:42,000 --> 00:02:48,430
+is to explain what is information and
+what is entropy.
+
+172
+00:02:48,430 --> 00:02:48,440
+
+ 
+
+173
+00:02:48,440 --> 00:02:50,110
+
+My first thought in approaching this was
+
+174
+00:02:50,110 --> 00:02:50,120
+My first thought in approaching this was
+ 
+
+175
+00:02:50,120 --> 00:02:51,350
+My first thought in approaching this was
+to take a look at the relative
+
+176
+00:02:51,350 --> 00:02:51,360
+to take a look at the relative
+ 
+
+177
+00:02:51,360 --> 00:02:52,830
+to take a look at the relative
+frequencies of different letters in the
+
+178
+00:02:52,830 --> 00:02:52,840
+frequencies of different letters in the
+ 
+
+179
+00:02:52,840 --> 00:02:54,270
+frequencies of different letters in the
+English language.
+
+180
+00:02:54,270 --> 00:02:54,280
+English language.
+ 
+
+181
+00:02:54,280 --> 00:02:55,670
+English language.
+So, I thought, okay, is there an opening
+
+182
+00:02:55,670 --> 00:02:55,680
+So, I thought, okay, is there an opening
+ 
+
+183
+00:02:55,680 --> 00:02:57,430
+So, I thought, okay, is there an opening
+guess or an opening pair of guesses that
+
+184
+00:02:57,430 --> 00:02:57,440
+guess or an opening pair of guesses that
+ 
+
+185
+00:02:57,440 --> 00:02:58,830
+guess or an opening pair of guesses that
+hits a lot of these most frequent
+
+186
+00:02:58,830 --> 00:02:58,840
+hits a lot of these most frequent
+ 
+
+187
+00:02:58,840 --> 00:03:00,910
+hits a lot of these most frequent
+letters? And one that I was pretty fond
+
+188
+00:03:00,910 --> 00:03:00,920
+letters? And one that I was pretty fond
+ 
+
+189
+00:03:00,920 --> 00:03:03,710
+letters? And one that I was pretty fond
+of was doing other followed by nails.
+
+190
+00:03:03,710 --> 00:03:03,720
+of was doing other followed by nails.
+ 
+
+191
+00:03:03,720 --> 00:03:05,270
+of was doing other followed by nails.
+The thought is that if you hit a letter,
+
+192
+00:03:05,270 --> 00:03:05,280
+The thought is that if you hit a letter,
+ 
+
+193
+00:03:05,280 --> 00:03:06,509
+The thought is that if you hit a letter,
+you know, you get a green or a yellow.
+
+194
+00:03:06,509 --> 00:03:06,519
+you know, you get a green or a yellow.
+ 
+
+195
+00:03:06,519 --> 00:03:07,870
+you know, you get a green or a yellow.
+That always feels good. It feels like
+
+196
+00:03:07,870 --> 00:03:07,880
+That always feels good. It feels like
+ 
+
+197
+00:03:07,880 --> 00:03:09,470
+That always feels good. It feels like
+you're getting information. But, in
+
+198
+00:03:09,470 --> 00:03:09,480
+you're getting information. But, in
+ 
+
+199
+00:03:09,480 --> 00:03:11,190
+you're getting information. But, in
+these cases, even if you don't hit and
+
+200
+00:03:11,190 --> 00:03:11,200
+these cases, even if you don't hit and
+ 
+
+201
+00:03:11,200 --> 00:03:12,830
+these cases, even if you don't hit and
+you always get grays, that's still
+
+202
+00:03:12,830 --> 00:03:12,840
+you always get grays, that's still
+ 
+
+203
+00:03:12,840 --> 00:03:14,350
+you always get grays, that's still
+giving you a lot of information since
+
+204
+00:03:14,350 --> 00:03:14,360
+giving you a lot of information since
+ 
+
+205
+00:03:14,360 --> 00:03:15,910
+giving you a lot of information since
+it's pretty rare to find a word that
+
+206
+00:03:15,910 --> 00:03:15,920
+it's pretty rare to find a word that
+ 
+
+207
+00:03:15,920 --> 00:03:18,070
+it's pretty rare to find a word that
+doesn't have any of these letters.
+
+208
+00:03:18,070 --> 00:03:18,080
+doesn't have any of these letters.
+ 
+
+209
+00:03:18,080 --> 00:03:19,630
+doesn't have any of these letters.
+But, even still, that doesn't feel super
+
+210
+00:03:19,630 --> 00:03:19,640
+But, even still, that doesn't feel super
+ 
+
+211
+00:03:19,640 --> 00:03:21,390
+But, even still, that doesn't feel super
+systematic cuz, for example, it does
+
+212
+00:03:21,390 --> 00:03:21,400
+systematic cuz, for example, it does
+ 
+
+213
+00:03:21,400 --> 00:03:22,710
+systematic cuz, for example, it does
+nothing to consider the order of the
+
+214
+00:03:22,710 --> 00:03:22,720
+nothing to consider the order of the
+ 
+
+215
+00:03:22,720 --> 00:03:24,509
+nothing to consider the order of the
+letters. Why type nails when I could
+
+216
+00:03:24,509 --> 00:03:24,519
+letters. Why type nails when I could
+ 
+
+217
+00:03:24,519 --> 00:03:26,990
+letters. Why type nails when I could
+type snail? Is it better to have that s
+
+218
+00:03:26,990 --> 00:03:27,000
+type snail? Is it better to have that s
+ 
+
+219
+00:03:27,000 --> 00:03:29,070
+type snail? Is it better to have that s
+at the end? I'm not really sure.
+
+220
+00:03:29,070 --> 00:03:29,080
+at the end? I'm not really sure.
+ 
+
+221
+00:03:29,080 --> 00:03:30,390
+at the end? I'm not really sure.
+Now, a friend of mine said that he liked
+
+222
+00:03:30,390 --> 00:03:30,400
+Now, a friend of mine said that he liked
+ 
+
+223
+00:03:30,400 --> 00:03:32,830
+Now, a friend of mine said that he liked
+to open with the word wee-wee, which
+
+224
+00:03:32,830 --> 00:03:32,840
+to open with the word wee-wee, which
+ 
+
+225
+00:03:32,840 --> 00:03:34,150
+to open with the word wee-wee, which
+kind of surprised me cuz it has some
+
+226
+00:03:34,150 --> 00:03:34,160
+kind of surprised me cuz it has some
+ 
+
+227
+00:03:34,160 --> 00:03:36,030
+kind of surprised me cuz it has some
+uncommon letters in there like the w and
+
+228
+00:03:36,030 --> 00:03:36,040
+uncommon letters in there like the w and
+ 
+
+229
+00:03:36,040 --> 00:03:37,110
+uncommon letters in there like the w and
+the y.
+
+230
+00:03:37,110 --> 00:03:37,120
+the y.
+ 
+
+231
+00:03:37,120 --> 00:03:38,550
+the y.
+But, who knows? Maybe that is a better
+
+232
+00:03:38,550 --> 00:03:38,560
+But, who knows? Maybe that is a better
+ 
+
+233
+00:03:38,560 --> 00:03:40,110
+But, who knows? Maybe that is a better
+opener. Is there some kind of
+
+234
+00:03:40,110 --> 00:03:40,120
+opener. Is there some kind of
+ 
+
+235
+00:03:40,120 --> 00:03:42,229
+opener. Is there some kind of
+quantitative score that we can give to
+
+236
+00:03:42,229 --> 00:03:42,239
+quantitative score that we can give to
+ 
+
+237
+00:03:42,239 --> 00:03:45,229
+quantitative score that we can give to
+judge the quality of a potential guess?
+
+238
+00:03:45,229 --> 00:03:45,239
+judge the quality of a potential guess?
+ 
+
+239
+00:03:45,239 --> 00:03:46,229
+judge the quality of a potential guess?
+Now, to set up for the way that we're
+
+240
+00:03:46,229 --> 00:03:46,239
+Now, to set up for the way that we're
+ 
+
+241
+00:03:46,239 --> 00:03:48,229
+Now, to set up for the way that we're
+going to rank possible guesses, let's go
+
+242
+00:03:48,229 --> 00:03:48,239
+going to rank possible guesses, let's go
+ 
+
+243
+00:03:48,239 --> 00:03:49,910
+going to rank possible guesses, let's go
+back and add a little clarity to how
+
+244
+00:03:49,910 --> 00:03:49,920
+back and add a little clarity to how
+ 
+
+245
+00:03:49,920 --> 00:03:51,910
+back and add a little clarity to how
+exactly the game is set up. So, there's
+
+246
+00:03:51,910 --> 00:03:51,920
+exactly the game is set up. So, there's
+ 
+
+247
+00:03:51,920 --> 00:03:53,670
+exactly the game is set up. So, there's
+a list of words that it will allow you
+
+248
+00:03:53,670 --> 00:03:53,680
+a list of words that it will allow you
+ 
+
+249
+00:03:53,680 --> 00:03:55,030
+a list of words that it will allow you
+to enter that are considered valid
+
+250
+00:03:55,030 --> 00:03:55,040
+to enter that are considered valid
+ 
+
+251
+00:03:55,040 --> 00:03:57,430
+to enter that are considered valid
+guesses that's just about 13,000 words
+
+252
+00:03:57,430 --> 00:03:57,440
+guesses that's just about 13,000 words
+ 
+
+253
+00:03:57,440 --> 00:03:58,950
+guesses that's just about 13,000 words
+long. But, when you look at it, there's
+
+254
+00:03:58,950 --> 00:03:58,960
+long. But, when you look at it, there's
+ 
+
+255
+00:03:58,960 --> 00:04:00,710
+long. But, when you look at it, there's
+a lot of really uncommon things, things
+
+256
+00:04:00,710 --> 00:04:00,720
+a lot of really uncommon things, things
+ 
+
+257
+00:04:00,720 --> 00:04:03,950
+a lot of really uncommon things, things
+like ahead or ali and arg, the kind of
+
+258
+00:04:03,950 --> 00:04:03,960
+like ahead or ali and arg, the kind of
+ 
+
+259
+00:04:03,960 --> 00:04:05,510
+like ahead or ali and arg, the kind of
+words that bring about family arguments
+
+260
+00:04:05,510 --> 00:04:05,520
+words that bring about family arguments
+ 
+
+261
+00:04:05,520 --> 00:04:07,430
+words that bring about family arguments
+in a game of Scrabble. But, the vibe of
+
+262
+00:04:07,430 --> 00:04:07,440
+in a game of Scrabble. But, the vibe of
+ 
+
+263
+00:04:07,440 --> 00:04:08,910
+in a game of Scrabble. But, the vibe of
+the game is that the answer is always
+
+264
+00:04:08,910 --> 00:04:08,920
+the game is that the answer is always
+ 
+
+265
+00:04:08,920 --> 00:04:10,990
+the game is that the answer is always
+going to be a decently common word. And
+
+266
+00:04:10,990 --> 00:04:11,000
+going to be a decently common word. And
+ 
+
+267
+00:04:11,000 --> 00:04:12,550
+going to be a decently common word. And
+in fact, there's another list of around
+
+268
+00:04:12,550 --> 00:04:12,560
+in fact, there's another list of around
+ 
+
+269
+00:04:12,560 --> 00:04:14,830
+in fact, there's another list of around
+2,300 words that are the possible
+
+270
+00:04:14,830 --> 00:04:14,840
+2,300 words that are the possible
+ 
+
+271
+00:04:14,840 --> 00:04:17,270
+2,300 words that are the possible
+answers. And this is a human-curated
+
+272
+00:04:17,270 --> 00:04:17,280
+answers. And this is a human-curated
+ 
+
+273
+00:04:17,280 --> 00:04:19,229
+answers. And this is a human-curated
+list, I I think specifically by the game
+
+274
+00:04:19,229 --> 00:04:19,239
+list, I I think specifically by the game
+ 
+
+275
+00:04:19,239 --> 00:04:20,830
+list, I I think specifically by the game
+creator's girlfriend, which is kind of
+
+276
+00:04:20,830 --> 00:04:20,840
+creator's girlfriend, which is kind of
+ 
+
+277
+00:04:20,840 --> 00:04:23,110
+creator's girlfriend, which is kind of
+fun. But, what I would like to do, our
+
+278
+00:04:23,110 --> 00:04:23,120
+fun. But, what I would like to do, our
+ 
+
+279
+00:04:23,120 --> 00:04:25,110
+fun. But, what I would like to do, our
+challenge for this project, is to see if
+
+280
+00:04:25,110 --> 00:04:25,120
+challenge for this project, is to see if
+ 
+
+281
+00:04:25,120 --> 00:04:26,870
+challenge for this project, is to see if
+we can write a program solving Wordle
+
+282
+00:04:26,870 --> 00:04:26,880
+we can write a program solving Wordle
+ 
+
+283
+00:04:26,880 --> 00:04:28,590
+we can write a program solving Wordle
+that doesn't incorporate previous
+
+284
+00:04:28,590 --> 00:04:28,600
+that doesn't incorporate previous
+ 
+
+285
+00:04:28,600 --> 00:04:30,830
+that doesn't incorporate previous
+knowledge about this list. For one
+
+286
+00:04:30,830 --> 00:04:30,840
+knowledge about this list. For one
+ 
+
+287
+00:04:30,840 --> 00:04:32,190
+knowledge about this list. For one
+thing, there's plenty of pretty common
+
+288
+00:04:32,190 --> 00:04:32,200
+thing, there's plenty of pretty common
+ 
+
+289
+00:04:32,200 --> 00:04:34,030
+thing, there's plenty of pretty common
+five-letter words that you won't find in
+
+290
+00:04:34,030 --> 00:04:34,040
+five-letter words that you won't find in
+ 
+
+291
+00:04:34,040 --> 00:04:35,630
+five-letter words that you won't find in
+that list. So, it would be better to
+
+292
+00:04:35,630 --> 00:04:35,640
+that list. So, it would be better to
+ 
+
+293
+00:04:35,640 --> 00:04:36,950
+that list. So, it would be better to
+write a program that's a little more
+
+294
+00:04:36,950 --> 00:04:36,960
+write a program that's a little more
+ 
+
+295
+00:04:36,960 --> 00:04:38,750
+write a program that's a little more
+resilient and would play Wordle against
+
+296
+00:04:38,750 --> 00:04:38,760
+resilient and would play Wordle against
+ 
+
+297
+00:04:38,760 --> 00:04:40,630
+resilient and would play Wordle against
+anyone, not just what happens to be the
+
+298
+00:04:40,630 --> 00:04:40,640
+anyone, not just what happens to be the
+ 
+
+299
+00:04:40,640 --> 00:04:42,950
+anyone, not just what happens to be the
+official website. And also, the reason
+
+300
+00:04:42,950 --> 00:04:42,960
+official website. And also, the reason
+ 
+
+301
+00:04:42,960 --> 00:04:44,630
+official website. And also, the reason
+that we know what this list of possible
+
+302
+00:04:44,630 --> 00:04:44,640
+that we know what this list of possible
+ 
+
+303
+00:04:44,640 --> 00:04:46,270
+that we know what this list of possible
+answers is is because it's visible in
+
+304
+00:04:46,270 --> 00:04:46,280
+answers is is because it's visible in
+ 
+
+305
+00:04:46,280 --> 00:04:48,110
+answers is is because it's visible in
+the source code. But, the way that it's
+
+306
+00:04:48,110 --> 00:04:48,120
+the source code. But, the way that it's
+ 
+
+307
+00:04:48,120 --> 00:04:49,950
+the source code. But, the way that it's
+visible in the source code is in the
+
+308
+00:04:49,950 --> 00:04:49,960
+visible in the source code is in the
+ 
+
+309
+00:04:49,960 --> 00:04:51,909
+visible in the source code is in the
+specific order in which answers come up
+
+310
+00:04:51,909 --> 00:04:51,919
+specific order in which answers come up
+ 
+
+311
+00:04:51,919 --> 00:04:53,550
+specific order in which answers come up
+from day to day. So, you could always
+
+312
+00:04:53,550 --> 00:04:53,560
+from day to day. So, you could always
+ 
+
+313
+00:04:53,560 --> 00:04:55,390
+from day to day. So, you could always
+just look up what tomorrow's answer will
+
+314
+00:04:55,390 --> 00:04:55,400
+just look up what tomorrow's answer will
+ 
+
+315
+00:04:55,400 --> 00:04:56,270
+just look up what tomorrow's answer will
+be.
+
+316
+00:04:56,270 --> 00:04:56,280
+be.
+ 
+
+317
+00:04:56,280 --> 00:04:57,750
+be.
+So, clearly there's some sense in which
+
+318
+00:04:57,750 --> 00:04:57,760
+So, clearly there's some sense in which
+ 
+
+319
+00:04:57,760 --> 00:04:59,230
+So, clearly there's some sense in which
+using the list is cheating. And what
+
+320
+00:04:59,230 --> 00:04:59,240
+using the list is cheating. And what
+ 
+
+321
+00:04:59,240 --> 00:05:00,790
+using the list is cheating. And what
+makes for a more interesting puzzle and
+
+322
+00:05:00,790 --> 00:05:00,800
+makes for a more interesting puzzle and
+ 
+
+323
+00:05:00,800 --> 00:05:02,950
+makes for a more interesting puzzle and
+a richer information theory lesson is to
+
+324
+00:05:02,950 --> 00:05:02,960
+a richer information theory lesson is to
+ 
+
+325
+00:05:02,960 --> 00:05:04,909
+a richer information theory lesson is to
+instead use some more universal data,
+
+326
+00:05:04,909 --> 00:05:04,919
+instead use some more universal data,
+ 
+
+327
+00:05:04,919 --> 00:05:06,550
+instead use some more universal data,
+like relative word frequencies in
+
+328
+00:05:06,550 --> 00:05:06,560
+like relative word frequencies in
+ 
+
+329
+00:05:06,560 --> 00:05:08,470
+like relative word frequencies in
+general, to capture this intuition of
+
+330
+00:05:08,470 --> 00:05:08,480
+general, to capture this intuition of
+ 
+
+331
+00:05:08,480 --> 00:05:09,950
+general, to capture this intuition of
+having a preference for more common
+
+332
+00:05:09,950 --> 00:05:09,960
+having a preference for more common
+ 
+
+333
+00:05:09,960 --> 00:05:11,510
+having a preference for more common
+words.
+
+334
+00:05:11,510 --> 00:05:11,520
+words.
+ 
+
+335
+00:05:11,520 --> 00:05:14,470
+words.
+So, of these 13,000 possibilities, how
+
+336
+00:05:14,470 --> 00:05:14,480
+So, of these 13,000 possibilities, how
+ 
+
+337
+00:05:14,480 --> 00:05:16,510
+So, of these 13,000 possibilities, how
+should we choose the opening guess? For
+
+338
+00:05:16,510 --> 00:05:16,520
+should we choose the opening guess? For
+ 
+
+339
+00:05:16,520 --> 00:05:18,270
+should we choose the opening guess? For
+example, if my friend proposes weary,
+
+340
+00:05:18,270 --> 00:05:18,280
+example, if my friend proposes weary,
+ 
+
+341
+00:05:18,280 --> 00:05:20,390
+example, if my friend proposes weary,
+how should we analyze its quality?
+
+342
+00:05:20,390 --> 00:05:20,400
+how should we analyze its quality?
+ 
+
+343
+00:05:20,400 --> 00:05:21,790
+how should we analyze its quality?
+Well, the reason he said he likes that
+
+344
+00:05:21,790 --> 00:05:21,800
+Well, the reason he said he likes that
+ 
+
+345
+00:05:21,800 --> 00:05:24,110
+Well, the reason he said he likes that
+unlikely W is that he likes the long
+
+346
+00:05:24,110 --> 00:05:24,120
+unlikely W is that he likes the long
+ 
+
+347
+00:05:24,120 --> 00:05:26,230
+unlikely W is that he likes the long
+shot nature of just how good it feels if
+
+348
+00:05:26,230 --> 00:05:26,240
+shot nature of just how good it feels if
+ 
+
+349
+00:05:26,240 --> 00:05:28,390
+shot nature of just how good it feels if
+you do hit that W. For example, if the
+
+350
+00:05:28,390 --> 00:05:28,400
+you do hit that W. For example, if the
+ 
+
+351
+00:05:28,400 --> 00:05:29,790
+you do hit that W. For example, if the
+first pattern revealed was something
+
+352
+00:05:29,790 --> 00:05:29,800
+first pattern revealed was something
+ 
+
+353
+00:05:29,800 --> 00:05:31,710
+first pattern revealed was something
+like this, then it turns out there are
+
+354
+00:05:31,710 --> 00:05:31,720
+like this, then it turns out there are
+ 
+
+355
+00:05:31,720 --> 00:05:34,710
+like this, then it turns out there are
+only 58 words in this giant lexicon that
+
+356
+00:05:34,710 --> 00:05:34,720
+only 58 words in this giant lexicon that
+ 
+
+357
+00:05:34,720 --> 00:05:36,750
+only 58 words in this giant lexicon that
+match that pattern. So, that's a huge
+
+358
+00:05:36,750 --> 00:05:36,760
+match that pattern. So, that's a huge
+ 
+
+359
+00:05:36,760 --> 00:05:39,190
+match that pattern. So, that's a huge
+reduction from 13,000. But, the flip
+
+360
+00:05:39,190 --> 00:05:39,200
+reduction from 13,000. But, the flip
+ 
+
+361
+00:05:39,200 --> 00:05:40,790
+reduction from 13,000. But, the flip
+side of that, of course, is that it's
+
+362
+00:05:40,790 --> 00:05:40,800
+side of that, of course, is that it's
+ 
+
+363
+00:05:40,800 --> 00:05:42,510
+side of that, of course, is that it's
+very uncommon to get a pattern like
+
+364
+00:05:42,510 --> 00:05:42,520
+very uncommon to get a pattern like
+ 
+
+365
+00:05:42,520 --> 00:05:44,710
+very uncommon to get a pattern like
+this. Specifically, if each word was
+
+366
+00:05:44,710 --> 00:05:44,720
+this. Specifically, if each word was
+ 
+
+367
+00:05:44,720 --> 00:05:46,670
+this. Specifically, if each word was
+equally likely to be the answer, the
+
+368
+00:05:46,670 --> 00:05:46,680
+equally likely to be the answer, the
+ 
+
+369
+00:05:46,680 --> 00:05:48,350
+equally likely to be the answer, the
+probability of hitting this pattern
+
+370
+00:05:48,350 --> 00:05:48,360
+probability of hitting this pattern
+ 
+
+371
+00:05:48,360 --> 00:05:51,550
+probability of hitting this pattern
+would be 58 divided by around 13,000.
+
+372
+00:05:51,550 --> 00:05:51,560
+would be 58 divided by around 13,000.
+ 
+
+373
+00:05:51,560 --> 00:05:53,030
+would be 58 divided by around 13,000.
+Of course, they're not equally likely to
+
+374
+00:05:53,030 --> 00:05:53,040
+Of course, they're not equally likely to
+ 
+
+375
+00:05:53,040 --> 00:05:54,390
+Of course, they're not equally likely to
+be answers. Most of these are very
+
+376
+00:05:54,390 --> 00:05:54,400
+be answers. Most of these are very
+ 
+
+377
+00:05:54,400 --> 00:05:56,630
+be answers. Most of these are very
+obscure and even questionable words. But
+
+378
+00:05:56,630 --> 00:05:56,640
+obscure and even questionable words. But
+ 
+
+379
+00:05:56,640 --> 00:05:58,030
+obscure and even questionable words. But
+at least for our first pass at all of
+
+380
+00:05:58,030 --> 00:05:58,040
+at least for our first pass at all of
+ 
+
+381
+00:05:58,040 --> 00:05:59,230
+at least for our first pass at all of
+this, let's assume that they're all
+
+382
+00:05:59,230 --> 00:05:59,240
+this, let's assume that they're all
+ 
+
+383
+00:05:59,240 --> 00:06:00,950
+this, let's assume that they're all
+equally likely and then refine that a
+
+384
+00:06:00,950 --> 00:06:00,960
+equally likely and then refine that a
+ 
+
+385
+00:06:00,960 --> 00:06:02,950
+equally likely and then refine that a
+bit later. The point is the pattern with
+
+386
+00:06:02,950 --> 00:06:02,960
+bit later. The point is the pattern with
+ 
+
+387
+00:06:02,960 --> 00:06:05,070
+bit later. The point is the pattern with
+a lot of information is by its very
+
+388
+00:06:05,070 --> 00:06:05,080
+a lot of information is by its very
+ 
+
+389
+00:06:05,080 --> 00:06:07,750
+a lot of information is by its very
+nature unlikely to occur. In fact, what
+
+390
+00:06:07,750 --> 00:06:07,760
+nature unlikely to occur. In fact, what
+ 
+
+391
+00:06:07,760 --> 00:06:10,230
+nature unlikely to occur. In fact, what
+it means to be informative is that it's
+
+392
+00:06:10,230 --> 00:06:10,240
+it means to be informative is that it's
+ 
+
+393
+00:06:10,240 --> 00:06:11,950
+it means to be informative is that it's
+unlikely.
+
+394
+00:06:11,950 --> 00:06:11,960
+unlikely.
+ 
+
+395
+00:06:11,960 --> 00:06:13,630
+unlikely.
+A much more probable pattern to see with
+
+396
+00:06:13,630 --> 00:06:13,640
+A much more probable pattern to see with
+ 
+
+397
+00:06:13,640 --> 00:06:15,750
+A much more probable pattern to see with
+this opening would be something like
+
+398
+00:06:15,750 --> 00:06:15,760
+this opening would be something like
+ 
+
+399
+00:06:15,760 --> 00:06:17,870
+this opening would be something like
+this, where of course there's not a W in
+
+400
+00:06:17,870 --> 00:06:17,880
+this, where of course there's not a W in
+ 
+
+401
+00:06:17,880 --> 00:06:19,510
+this, where of course there's not a W in
+it. Maybe there's an E, and maybe
+
+402
+00:06:19,510 --> 00:06:19,520
+it. Maybe there's an E, and maybe
+ 
+
+403
+00:06:19,520 --> 00:06:21,030
+it. Maybe there's an E, and maybe
+there's no A, there's no R, there's no
+
+404
+00:06:21,030 --> 00:06:21,040
+there's no A, there's no R, there's no
+ 
+
+405
+00:06:21,040 --> 00:06:22,110
+there's no A, there's no R, there's no
+Y.
+
+406
+00:06:22,110 --> 00:06:22,120
+Y.
+ 
+
+407
+00:06:22,120 --> 00:06:24,070
+Y.
+In this case, there were 1,400 possible
+
+408
+00:06:24,070 --> 00:06:24,080
+In this case, there were 1,400 possible
+ 
+
+409
+00:06:24,080 --> 00:06:26,350
+In this case, there were 1,400 possible
+matches. So if all were equally likely,
+
+410
+00:06:26,350 --> 00:06:26,360
+matches. So if all were equally likely,
+ 
+
+411
+00:06:26,360 --> 00:06:27,710
+matches. So if all were equally likely,
+it works out to be a probability of
+
+412
+00:06:27,710 --> 00:06:27,720
+it works out to be a probability of
+ 
+
+413
+00:06:27,720 --> 00:06:30,110
+it works out to be a probability of
+about 11% that this is the pattern you
+
+414
+00:06:30,110 --> 00:06:30,120
+about 11% that this is the pattern you
+ 
+
+415
+00:06:30,120 --> 00:06:32,030
+about 11% that this is the pattern you
+would see. So the most likely outcomes
+
+416
+00:06:32,030 --> 00:06:32,040
+would see. So the most likely outcomes
+ 
+
+417
+00:06:32,040 --> 00:06:34,270
+would see. So the most likely outcomes
+are also the least informative.
+
+418
+00:06:34,270 --> 00:06:34,280
+are also the least informative.
+ 
+
+419
+00:06:34,280 --> 00:06:35,630
+are also the least informative.
+To get a more global view here, let me
+
+420
+00:06:35,630 --> 00:06:35,640
+To get a more global view here, let me
+ 
+
+421
+00:06:35,640 --> 00:06:37,310
+To get a more global view here, let me
+show you the full distribution of
+
+422
+00:06:37,310 --> 00:06:37,320
+show you the full distribution of
+ 
+
+423
+00:06:37,320 --> 00:06:39,110
+show you the full distribution of
+probabilities across all of the
+
+424
+00:06:39,110 --> 00:06:39,120
+probabilities across all of the
+ 
+
+425
+00:06:39,120 --> 00:06:41,870
+probabilities across all of the
+different patterns that you might see.
+
+426
+00:06:41,870 --> 00:06:41,880
+different patterns that you might see.
+ 
+
+427
+00:06:41,880 --> 00:06:43,590
+different patterns that you might see.
+So each bar that you're looking at
+
+428
+00:06:43,590 --> 00:06:43,600
+So each bar that you're looking at
+ 
+
+429
+00:06:43,600 --> 00:06:45,310
+So each bar that you're looking at
+corresponds to a possible pattern of
+
+430
+00:06:45,310 --> 00:06:45,320
+corresponds to a possible pattern of
+ 
+
+431
+00:06:45,320 --> 00:06:47,270
+corresponds to a possible pattern of
+colors that could be revealed, of which
+
+432
+00:06:47,270 --> 00:06:47,280
+colors that could be revealed, of which
+ 
+
+433
+00:06:47,280 --> 00:06:48,350
+colors that could be revealed, of which
+there are three to the fifth
+
+434
+00:06:48,350 --> 00:06:48,360
+there are three to the fifth
+ 
+
+435
+00:06:48,360 --> 00:06:49,710
+there are three to the fifth
+possibilities.
+
+436
+00:06:49,710 --> 00:06:49,720
+possibilities.
+ 
+
+437
+00:06:49,720 --> 00:06:50,750
+possibilities.
+And they're organized from left to
+
+438
+00:06:50,750 --> 00:06:50,760
+And they're organized from left to
+ 
+
+439
+00:06:50,760 --> 00:06:52,870
+And they're organized from left to
+right, most common to least common.
+
+440
+00:06:52,870 --> 00:06:52,880
+right, most common to least common.
+ 
+
+441
+00:06:52,880 --> 00:06:54,750
+right, most common to least common.
+So the most common possibility here is
+
+442
+00:06:54,750 --> 00:06:54,760
+So the most common possibility here is
+ 
+
+443
+00:06:54,760 --> 00:06:56,430
+So the most common possibility here is
+that you get all grays. That happens
+
+444
+00:06:56,430 --> 00:06:56,440
+that you get all grays. That happens
+ 
+
+445
+00:06:56,440 --> 00:06:58,510
+that you get all grays. That happens
+about 14% of the time.
+
+446
+00:06:58,510 --> 00:06:58,520
+about 14% of the time.
+ 
+
+447
+00:06:58,520 --> 00:07:00,070
+about 14% of the time.
+And what you're hoping for when you make
+
+448
+00:07:00,070 --> 00:07:00,080
+And what you're hoping for when you make
+ 
+
+449
+00:07:00,080 --> 00:07:01,870
+And what you're hoping for when you make
+a guess is that you end up somewhere out
+
+450
+00:07:01,870 --> 00:07:01,880
+a guess is that you end up somewhere out
+ 
+
+451
+00:07:01,880 --> 00:07:04,030
+a guess is that you end up somewhere out
+in this long tail, like over here where
+
+452
+00:07:04,030 --> 00:07:04,040
+in this long tail, like over here where
+ 
+
+453
+00:07:04,040 --> 00:07:05,909
+in this long tail, like over here where
+there's only 18 possibilities for what
+
+454
+00:07:05,909 --> 00:07:05,919
+there's only 18 possibilities for what
+ 
+
+455
+00:07:05,919 --> 00:07:08,270
+there's only 18 possibilities for what
+matches this pattern that evidently look
+
+456
+00:07:08,270 --> 00:07:08,280
+matches this pattern that evidently look
+ 
+
+457
+00:07:08,280 --> 00:07:09,790
+matches this pattern that evidently look
+like this.
+
+458
+00:07:09,790 --> 00:07:09,800
+like this.
+ 
+
+459
+00:07:09,800 --> 00:07:11,190
+like this.
+Or if we venture a little farther to the
+
+460
+00:07:11,190 --> 00:07:11,200
+Or if we venture a little farther to the
+ 
+
+461
+00:07:11,200 --> 00:07:13,070
+Or if we venture a little farther to the
+left, you know, maybe we go all the way
+
+462
+00:07:13,070 --> 00:07:13,080
+left, you know, maybe we go all the way
+ 
+
+463
+00:07:13,080 --> 00:07:14,790
+left, you know, maybe we go all the way
+over here.
+
+464
+00:07:14,790 --> 00:07:14,800
+over here.
+ 
+
+465
+00:07:14,800 --> 00:07:16,510
+over here.
+Okay, here's a good puzzle for you. What
+
+466
+00:07:16,510 --> 00:07:16,520
+Okay, here's a good puzzle for you. What
+ 
+
+467
+00:07:16,520 --> 00:07:17,790
+Okay, here's a good puzzle for you. What
+are the three words in the English
+
+468
+00:07:17,790 --> 00:07:17,800
+are the three words in the English
+ 
+
+469
+00:07:17,800 --> 00:07:19,950
+are the three words in the English
+language that start with a W, end with a
+
+470
+00:07:19,950 --> 00:07:19,960
+language that start with a W, end with a
+ 
+
+471
+00:07:19,960 --> 00:07:22,390
+language that start with a W, end with a
+Y, and have an R somewhere in them?
+
+472
+00:07:22,390 --> 00:07:22,400
+Y, and have an R somewhere in them?
+ 
+
+473
+00:07:22,400 --> 00:07:24,110
+Y, and have an R somewhere in them?
+Turns out the answers are, uh, let's
+
+474
+00:07:24,110 --> 00:07:24,120
+Turns out the answers are, uh, let's
+ 
+
+475
+00:07:24,120 --> 00:07:24,950
+Turns out the answers are, uh, let's
+see.
+
+476
+00:07:24,950 --> 00:07:24,960
+see.
+ 
+
+477
+00:07:24,960 --> 00:07:27,470
+see.
+Wordy, wormy, and Riley.
+
+478
+00:07:27,470 --> 00:07:27,480
+Wordy, wormy, and Riley.
+ 
+
+479
+00:07:27,480 --> 00:07:29,150
+Wordy, wormy, and Riley.
+So to judge how good this word is
+
+480
+00:07:29,150 --> 00:07:29,160
+So to judge how good this word is
+ 
+
+481
+00:07:29,160 --> 00:07:31,950
+So to judge how good this word is
+overall, we want some kind of measure of
+
+482
+00:07:31,950 --> 00:07:31,960
+overall, we want some kind of measure of
+ 
+
+483
+00:07:31,960 --> 00:07:33,909
+overall, we want some kind of measure of
+the expected amount of information that
+
+484
+00:07:33,909 --> 00:07:33,919
+the expected amount of information that
+ 
+
+485
+00:07:33,919 --> 00:07:35,030
+the expected amount of information that
+you're going to get from this
+
+486
+00:07:35,030 --> 00:07:35,040
+you're going to get from this
+ 
+
+487
+00:07:35,040 --> 00:07:37,070
+you're going to get from this
+distribution. If we go through each
+
+488
+00:07:37,070 --> 00:07:37,080
+distribution. If we go through each
+ 
+
+489
+00:07:37,080 --> 00:07:38,909
+distribution. If we go through each
+pattern and we multiply its probability
+
+490
+00:07:38,909 --> 00:07:38,919
+pattern and we multiply its probability
+ 
+
+491
+00:07:38,919 --> 00:07:41,190
+pattern and we multiply its probability
+of occurring times something that
+
+492
+00:07:41,190 --> 00:07:41,200
+of occurring times something that
+ 
+
+493
+00:07:41,200 --> 00:07:43,150
+of occurring times something that
+measures how informative it is, that can
+
+494
+00:07:43,150 --> 00:07:43,160
+measures how informative it is, that can
+ 
+
+495
+00:07:43,160 --> 00:07:45,870
+measures how informative it is, that can
+maybe give us an objective score.
+
+496
+00:07:45,870 --> 00:07:45,880
+maybe give us an objective score.
+ 
+
+497
+00:07:45,880 --> 00:07:47,230
+maybe give us an objective score.
+Now, your first instinct for what that
+
+498
+00:07:47,230 --> 00:07:47,240
+Now, your first instinct for what that
+ 
+
+499
+00:07:47,240 --> 00:07:49,230
+Now, your first instinct for what that
+something should be might be the number
+
+500
+00:07:49,230 --> 00:07:49,240
+something should be might be the number
+ 
+
+501
+00:07:49,240 --> 00:07:50,950
+something should be might be the number
+of matches. You know, you want a lower
+
+502
+00:07:50,950 --> 00:07:50,960
+of matches. You know, you want a lower
+ 
+
+503
+00:07:50,960 --> 00:07:53,310
+of matches. You know, you want a lower
+average number of matches. But instead,
+
+504
+00:07:53,310 --> 00:07:53,320
+average number of matches. But instead,
+ 
+
+505
+00:07:53,320 --> 00:07:54,910
+average number of matches. But instead,
+I'd like to use a more universal
+
+506
+00:07:54,910 --> 00:07:54,920
+I'd like to use a more universal
+ 
+
+507
+00:07:54,920 --> 00:07:56,230
+I'd like to use a more universal
+measurement that we often ascribe to
+
+508
+00:07:56,230 --> 00:07:56,240
+measurement that we often ascribe to
+ 
+
+509
+00:07:56,240 --> 00:07:58,230
+measurement that we often ascribe to
+information and one that will be more
+
+510
+00:07:58,230 --> 00:07:58,240
+information and one that will be more
+ 
+
+511
+00:07:58,240 --> 00:07:59,750
+information and one that will be more
+flexible once we have a different
+
+512
+00:07:59,750 --> 00:07:59,760
+flexible once we have a different
+ 
+
+513
+00:07:59,760 --> 00:08:01,270
+flexible once we have a different
+probability assigned to each of these
+
+514
+00:08:01,270 --> 00:08:01,280
+probability assigned to each of these
+ 
+
+515
+00:08:01,280 --> 00:08:03,270
+probability assigned to each of these
+13,000 words for whether or not they're
+
+516
+00:08:03,270 --> 00:08:03,280
+13,000 words for whether or not they're
+ 
+
+517
+00:08:03,280 --> 00:08:10,510
+13,000 words for whether or not they're
+actually the answer.
+
+518
+00:08:10,510 --> 00:08:10,520
+
+ 
+
+519
+00:08:10,520 --> 00:08:12,510
+
+The standard unit of information is the
+
+520
+00:08:12,510 --> 00:08:12,520
+The standard unit of information is the
+ 
+
+521
+00:08:12,520 --> 00:08:14,110
+The standard unit of information is the
+bit, which has a little bit of a funny
+
+522
+00:08:14,110 --> 00:08:14,120
+bit, which has a little bit of a funny
+ 
+
+523
+00:08:14,120 --> 00:08:15,830
+bit, which has a little bit of a funny
+formula but is really intuitive if we
+
+524
+00:08:15,830 --> 00:08:15,840
+formula but is really intuitive if we
+ 
+
+525
+00:08:15,840 --> 00:08:17,670
+formula but is really intuitive if we
+just look at examples.
+
+526
+00:08:17,670 --> 00:08:17,680
+just look at examples.
+ 
+
+527
+00:08:17,680 --> 00:08:19,270
+just look at examples.
+If you have an observation that cuts
+
+528
+00:08:19,270 --> 00:08:19,280
+If you have an observation that cuts
+ 
+
+529
+00:08:19,280 --> 00:08:21,550
+If you have an observation that cuts
+your space of possibilities in half, we
+
+530
+00:08:21,550 --> 00:08:21,560
+your space of possibilities in half, we
+ 
+
+531
+00:08:21,560 --> 00:08:23,990
+your space of possibilities in half, we
+say that it has one bit of information.
+
+532
+00:08:23,990 --> 00:08:24,000
+say that it has one bit of information.
+ 
+
+533
+00:08:24,000 --> 00:08:24,950
+say that it has one bit of information.
+In our example, the space of
+
+534
+00:08:24,950 --> 00:08:24,960
+In our example, the space of
+ 
+
+535
+00:08:24,960 --> 00:08:26,950
+In our example, the space of
+possibilities is all possible words and
+
+536
+00:08:26,950 --> 00:08:26,960
+possibilities is all possible words and
+ 
+
+537
+00:08:26,960 --> 00:08:28,270
+possibilities is all possible words and
+it turns out about half of the
+
+538
+00:08:28,270 --> 00:08:28,280
+it turns out about half of the
+ 
+
+539
+00:08:28,280 --> 00:08:29,950
+it turns out about half of the
+five-letter words have an S, a little
+
+540
+00:08:29,950 --> 00:08:29,960
+five-letter words have an S, a little
+ 
+
+541
+00:08:29,960 --> 00:08:31,790
+five-letter words have an S, a little
+less than that but about half.
+
+542
+00:08:31,790 --> 00:08:31,800
+less than that but about half.
+ 
+
+543
+00:08:31,800 --> 00:08:33,390
+less than that but about half.
+So, that observation would give you one
+
+544
+00:08:33,390 --> 00:08:33,400
+So, that observation would give you one
+ 
+
+545
+00:08:33,400 --> 00:08:35,029
+So, that observation would give you one
+bit of information.
+
+546
+00:08:35,029 --> 00:08:35,039
+bit of information.
+ 
+
+547
+00:08:35,039 --> 00:08:37,149
+bit of information.
+If instead a new fact chops down that
+
+548
+00:08:37,149 --> 00:08:37,159
+If instead a new fact chops down that
+ 
+
+549
+00:08:37,159 --> 00:08:38,750
+If instead a new fact chops down that
+space of possibilities by a factor of
+
+550
+00:08:38,750 --> 00:08:38,760
+space of possibilities by a factor of
+ 
+
+551
+00:08:38,760 --> 00:08:40,870
+space of possibilities by a factor of
+four, we say that it has two bits of
+
+552
+00:08:40,870 --> 00:08:40,880
+four, we say that it has two bits of
+ 
+
+553
+00:08:40,880 --> 00:08:42,670
+four, we say that it has two bits of
+information. For example, it turns out
+
+554
+00:08:42,670 --> 00:08:42,680
+information. For example, it turns out
+ 
+
+555
+00:08:42,680 --> 00:08:45,070
+information. For example, it turns out
+about a quarter of these words have a T.
+
+556
+00:08:45,070 --> 00:08:45,080
+about a quarter of these words have a T.
+ 
+
+557
+00:08:45,080 --> 00:08:46,670
+about a quarter of these words have a T.
+If the observation cuts that space by a
+
+558
+00:08:46,670 --> 00:08:46,680
+If the observation cuts that space by a
+ 
+
+559
+00:08:46,680 --> 00:08:48,310
+If the observation cuts that space by a
+factor of eight, we say it's three bits
+
+560
+00:08:48,310 --> 00:08:48,320
+factor of eight, we say it's three bits
+ 
+
+561
+00:08:48,320 --> 00:08:50,750
+factor of eight, we say it's three bits
+of information and so on and so forth.
+
+562
+00:08:50,750 --> 00:08:50,760
+of information and so on and so forth.
+ 
+
+563
+00:08:50,760 --> 00:08:52,630
+of information and so on and so forth.
+Four bits cuts it into a 16th, five bits
+
+564
+00:08:52,630 --> 00:08:52,640
+Four bits cuts it into a 16th, five bits
+ 
+
+565
+00:08:52,640 --> 00:08:54,870
+Four bits cuts it into a 16th, five bits
+cuts it into a 32nd.
+
+566
+00:08:54,870 --> 00:08:54,880
+cuts it into a 32nd.
+ 
+
+567
+00:08:54,880 --> 00:08:55,870
+cuts it into a 32nd.
+So, now is when you might want to take a
+
+568
+00:08:55,870 --> 00:08:55,880
+So, now is when you might want to take a
+ 
+
+569
+00:08:55,880 --> 00:08:57,790
+So, now is when you might want to take a
+moment and pause and ask for yourself,
+
+570
+00:08:57,790 --> 00:08:57,800
+moment and pause and ask for yourself,
+ 
+
+571
+00:08:57,800 --> 00:09:00,030
+moment and pause and ask for yourself,
+what is the formula for information, for
+
+572
+00:09:00,030 --> 00:09:00,040
+what is the formula for information, for
+ 
+
+573
+00:09:00,040 --> 00:09:01,710
+what is the formula for information, for
+the number of bits, in terms of the
+
+574
+00:09:01,710 --> 00:09:01,720
+the number of bits, in terms of the
+ 
+
+575
+00:09:01,720 --> 00:09:04,070
+the number of bits, in terms of the
+probability of an occurrence?
+
+576
+00:09:04,070 --> 00:09:04,080
+probability of an occurrence?
+ 
+
+577
+00:09:04,080 --> 00:09:04,990
+probability of an occurrence?
+Well, what we're saying here is
+
+578
+00:09:04,990 --> 00:09:05,000
+Well, what we're saying here is
+ 
+
+579
+00:09:05,000 --> 00:09:06,750
+Well, what we're saying here is
+basically that when you take 1/2 to the
+
+580
+00:09:06,750 --> 00:09:06,760
+basically that when you take 1/2 to the
+ 
+
+581
+00:09:06,760 --> 00:09:08,390
+basically that when you take 1/2 to the
+number of bits, that's the same thing as
+
+582
+00:09:08,390 --> 00:09:08,400
+number of bits, that's the same thing as
+ 
+
+583
+00:09:08,400 --> 00:09:10,310
+number of bits, that's the same thing as
+the probability, which is the same thing
+
+584
+00:09:10,310 --> 00:09:10,320
+the probability, which is the same thing
+ 
+
+585
+00:09:10,320 --> 00:09:11,870
+the probability, which is the same thing
+as saying two to the power of the number
+
+586
+00:09:11,870 --> 00:09:11,880
+as saying two to the power of the number
+ 
+
+587
+00:09:11,880 --> 00:09:14,110
+as saying two to the power of the number
+of bits is one over the probability,
+
+588
+00:09:14,110 --> 00:09:14,120
+of bits is one over the probability,
+ 
+
+589
+00:09:14,120 --> 00:09:15,510
+of bits is one over the probability,
+which rearranges further to saying the
+
+590
+00:09:15,510 --> 00:09:15,520
+which rearranges further to saying the
+ 
+
+591
+00:09:15,520 --> 00:09:17,670
+which rearranges further to saying the
+information is the log base two of one
+
+592
+00:09:17,670 --> 00:09:17,680
+information is the log base two of one
+ 
+
+593
+00:09:17,680 --> 00:09:19,510
+information is the log base two of one
+divided by the probability.
+
+594
+00:09:19,510 --> 00:09:19,520
+divided by the probability.
+ 
+
+595
+00:09:19,520 --> 00:09:20,950
+divided by the probability.
+And sometimes you see this with one more
+
+596
+00:09:20,950 --> 00:09:20,960
+And sometimes you see this with one more
+ 
+
+597
+00:09:20,960 --> 00:09:21,950
+And sometimes you see this with one more
+rearrangement still where the
+
+598
+00:09:21,950 --> 00:09:21,960
+rearrangement still where the
+ 
+
+599
+00:09:21,960 --> 00:09:23,910
+rearrangement still where the
+information is the negative log base two
+
+600
+00:09:23,910 --> 00:09:23,920
+information is the negative log base two
+ 
+
+601
+00:09:23,920 --> 00:09:25,470
+information is the negative log base two
+of the probability.
+
+602
+00:09:25,470 --> 00:09:25,480
+of the probability.
+ 
+
+603
+00:09:25,480 --> 00:09:26,870
+of the probability.
+Expressed like this, it can look a
+
+604
+00:09:26,870 --> 00:09:26,880
+Expressed like this, it can look a
+ 
+
+605
+00:09:26,880 --> 00:09:28,790
+Expressed like this, it can look a
+little bit weird to the uninitiated but
+
+606
+00:09:28,790 --> 00:09:28,800
+little bit weird to the uninitiated but
+ 
+
+607
+00:09:28,800 --> 00:09:30,550
+little bit weird to the uninitiated but
+it really is just a very intuitive idea
+
+608
+00:09:30,550 --> 00:09:30,560
+it really is just a very intuitive idea
+ 
+
+609
+00:09:30,560 --> 00:09:32,550
+it really is just a very intuitive idea
+of asking how many times you've cut down
+
+610
+00:09:32,550 --> 00:09:32,560
+of asking how many times you've cut down
+ 
+
+611
+00:09:32,560 --> 00:09:34,990
+of asking how many times you've cut down
+your possibilities in half.
+
+612
+00:09:34,990 --> 00:09:35,000
+your possibilities in half.
+ 
+
+613
+00:09:35,000 --> 00:09:36,110
+your possibilities in half.
+Now, if you're wondering, you know, I
+
+614
+00:09:36,110 --> 00:09:36,120
+Now, if you're wondering, you know, I
+ 
+
+615
+00:09:36,120 --> 00:09:37,350
+Now, if you're wondering, you know, I
+thought we were just playing a fun word
+
+616
+00:09:37,350 --> 00:09:37,360
+thought we were just playing a fun word
+ 
+
+617
+00:09:37,360 --> 00:09:38,870
+thought we were just playing a fun word
+game, why are logarithms entering the
+
+618
+00:09:38,870 --> 00:09:38,880
+game, why are logarithms entering the
+ 
+
+619
+00:09:38,880 --> 00:09:41,110
+game, why are logarithms entering the
+picture? One reason this is a nicer unit
+
+620
+00:09:41,110 --> 00:09:41,120
+picture? One reason this is a nicer unit
+ 
+
+621
+00:09:41,120 --> 00:09:42,510
+picture? One reason this is a nicer unit
+is it's just a lot easier to talk about
+
+622
+00:09:42,510 --> 00:09:42,520
+is it's just a lot easier to talk about
+ 
+
+623
+00:09:42,520 --> 00:09:44,630
+is it's just a lot easier to talk about
+very unlikely events. Much easier to say
+
+624
+00:09:44,630 --> 00:09:44,640
+very unlikely events. Much easier to say
+ 
+
+625
+00:09:44,640 --> 00:09:46,350
+very unlikely events. Much easier to say
+that an observation has 20 bits of
+
+626
+00:09:46,350 --> 00:09:46,360
+that an observation has 20 bits of
+ 
+
+627
+00:09:46,360 --> 00:09:48,150
+that an observation has 20 bits of
+information than it is to say that the
+
+628
+00:09:48,150 --> 00:09:48,160
+information than it is to say that the
+ 
+
+629
+00:09:48,160 --> 00:09:49,870
+information than it is to say that the
+probability of such and such occurring
+
+630
+00:09:49,870 --> 00:09:49,880
+probability of such and such occurring
+ 
+
+631
+00:09:49,880 --> 00:09:53,310
+probability of such and such occurring
+is 0.00000095.
+
+632
+00:09:53,310 --> 00:09:53,320
+
+ 
+
+633
+00:09:53,320 --> 00:09:54,830
+
+But a more substantive reason that this
+
+634
+00:09:54,830 --> 00:09:54,840
+But a more substantive reason that this
+ 
+
+635
+00:09:54,840 --> 00:09:56,590
+But a more substantive reason that this
+logarithmic expression turned out to be
+
+636
+00:09:56,590 --> 00:09:56,600
+logarithmic expression turned out to be
+ 
+
+637
+00:09:56,600 --> 00:09:58,390
+logarithmic expression turned out to be
+a very useful addition to the theory of
+
+638
+00:09:58,390 --> 00:09:58,400
+a very useful addition to the theory of
+ 
+
+639
+00:09:58,400 --> 00:10:00,670
+a very useful addition to the theory of
+probability is the way that information
+
+640
+00:10:00,670 --> 00:10:00,680
+probability is the way that information
+ 
+
+641
+00:10:00,680 --> 00:10:02,750
+probability is the way that information
+adds together. For example, if one
+
+642
+00:10:02,750 --> 00:10:02,760
+adds together. For example, if one
+ 
+
+643
+00:10:02,760 --> 00:10:04,110
+adds together. For example, if one
+observation gives you two bits of
+
+644
+00:10:04,110 --> 00:10:04,120
+observation gives you two bits of
+ 
+
+645
+00:10:04,120 --> 00:10:05,870
+observation gives you two bits of
+information, cutting your space down by
+
+646
+00:10:05,870 --> 00:10:05,880
+information, cutting your space down by
+ 
+
+647
+00:10:05,880 --> 00:10:07,870
+information, cutting your space down by
+four, and then a second observation,
+
+648
+00:10:07,870 --> 00:10:07,880
+four, and then a second observation,
+ 
+
+649
+00:10:07,880 --> 00:10:09,990
+four, and then a second observation,
+like your second guess in Wordle, gives
+
+650
+00:10:09,990 --> 00:10:10,000
+like your second guess in Wordle, gives
+ 
+
+651
+00:10:10,000 --> 00:10:11,710
+like your second guess in Wordle, gives
+you another three bits of information,
+
+652
+00:10:11,710 --> 00:10:11,720
+you another three bits of information,
+ 
+
+653
+00:10:11,720 --> 00:10:13,230
+you another three bits of information,
+chopping you down further by another
+
+654
+00:10:13,230 --> 00:10:13,240
+chopping you down further by another
+ 
+
+655
+00:10:13,240 --> 00:10:15,390
+chopping you down further by another
+factor of eight, the two together give
+
+656
+00:10:15,390 --> 00:10:15,400
+factor of eight, the two together give
+ 
+
+657
+00:10:15,400 --> 00:10:17,390
+factor of eight, the two together give
+you five bits of information. In the
+
+658
+00:10:17,390 --> 00:10:17,400
+you five bits of information. In the
+ 
+
+659
+00:10:17,400 --> 00:10:18,750
+you five bits of information. In the
+same way that probability likes to
+
+660
+00:10:18,750 --> 00:10:18,760
+same way that probability likes to
+ 
+
+661
+00:10:18,760 --> 00:10:21,870
+same way that probability likes to
+multiply, information likes to add.
+
+662
+00:10:21,870 --> 00:10:21,880
+multiply, information likes to add.
+ 
+
+663
+00:10:21,880 --> 00:10:22,950
+multiply, information likes to add.
+So, as soon as we're in the realm of
+
+664
+00:10:22,950 --> 00:10:22,960
+So, as soon as we're in the realm of
+ 
+
+665
+00:10:22,960 --> 00:10:24,550
+So, as soon as we're in the realm of
+something like an expected value, where
+
+666
+00:10:24,550 --> 00:10:24,560
+something like an expected value, where
+ 
+
+667
+00:10:24,560 --> 00:10:26,190
+something like an expected value, where
+we're adding a bunch of numbers up, the
+
+668
+00:10:26,190 --> 00:10:26,200
+we're adding a bunch of numbers up, the
+ 
+
+669
+00:10:26,200 --> 00:10:28,390
+we're adding a bunch of numbers up, the
+logs make it a lot nicer to deal with.
+
+670
+00:10:28,390 --> 00:10:28,400
+logs make it a lot nicer to deal with.
+ 
+
+671
+00:10:28,400 --> 00:10:29,910
+logs make it a lot nicer to deal with.
+Let's go back to our distribution for
+
+672
+00:10:29,910 --> 00:10:29,920
+Let's go back to our distribution for
+ 
+
+673
+00:10:29,920 --> 00:10:31,750
+Let's go back to our distribution for
+weary and add another little tracker on
+
+674
+00:10:31,750 --> 00:10:31,760
+weary and add another little tracker on
+ 
+
+675
+00:10:31,760 --> 00:10:33,710
+weary and add another little tracker on
+here showing us how much information
+
+676
+00:10:33,710 --> 00:10:33,720
+here showing us how much information
+ 
+
+677
+00:10:33,720 --> 00:10:35,710
+here showing us how much information
+there is for each pattern. The main
+
+678
+00:10:35,710 --> 00:10:35,720
+there is for each pattern. The main
+ 
+
+679
+00:10:35,720 --> 00:10:37,070
+there is for each pattern. The main
+thing I want you to notice is that the
+
+680
+00:10:37,070 --> 00:10:37,080
+thing I want you to notice is that the
+ 
+
+681
+00:10:37,080 --> 00:10:38,590
+thing I want you to notice is that the
+higher the probability, as we get to
+
+682
+00:10:38,590 --> 00:10:38,600
+higher the probability, as we get to
+ 
+
+683
+00:10:38,600 --> 00:10:40,550
+higher the probability, as we get to
+those more likely patterns, the lower
+
+684
+00:10:40,550 --> 00:10:40,560
+those more likely patterns, the lower
+ 
+
+685
+00:10:40,560 --> 00:10:42,350
+those more likely patterns, the lower
+the information, the fewer bits you
+
+686
+00:10:42,350 --> 00:10:42,360
+the information, the fewer bits you
+ 
+
+687
+00:10:42,360 --> 00:10:43,390
+the information, the fewer bits you
+gain.
+
+688
+00:10:43,390 --> 00:10:43,400
+gain.
+ 
+
+689
+00:10:43,400 --> 00:10:44,710
+gain.
+The way we measure the quality of this
+
+690
+00:10:44,710 --> 00:10:44,720
+The way we measure the quality of this
+ 
+
+691
+00:10:44,720 --> 00:10:47,030
+The way we measure the quality of this
+guess will be to take the expected value
+
+692
+00:10:47,030 --> 00:10:47,040
+guess will be to take the expected value
+ 
+
+693
+00:10:47,040 --> 00:10:48,990
+guess will be to take the expected value
+of this information. Where we go through
+
+694
+00:10:48,990 --> 00:10:49,000
+of this information. Where we go through
+ 
+
+695
+00:10:49,000 --> 00:10:50,510
+of this information. Where we go through
+each pattern, we say, how probable is
+
+696
+00:10:50,510 --> 00:10:50,520
+each pattern, we say, how probable is
+ 
+
+697
+00:10:50,520 --> 00:10:52,270
+each pattern, we say, how probable is
+it? And then we multiply that by, how
+
+698
+00:10:52,270 --> 00:10:52,280
+it? And then we multiply that by, how
+ 
+
+699
+00:10:52,280 --> 00:10:54,750
+it? And then we multiply that by, how
+many bits of information do we get?
+
+700
+00:10:54,750 --> 00:10:54,760
+many bits of information do we get?
+ 
+
+701
+00:10:54,760 --> 00:10:56,390
+many bits of information do we get?
+And in the example of weary, that turns
+
+702
+00:10:56,390 --> 00:10:56,400
+And in the example of weary, that turns
+ 
+
+703
+00:10:56,400 --> 00:10:59,590
+And in the example of weary, that turns
+out to be 4.9 bits. So, on average, the
+
+704
+00:10:59,590 --> 00:10:59,600
+out to be 4.9 bits. So, on average, the
+ 
+
+705
+00:10:59,600 --> 00:11:00,950
+out to be 4.9 bits. So, on average, the
+information you get from this opening
+
+706
+00:11:00,950 --> 00:11:00,960
+information you get from this opening
+ 
+
+707
+00:11:00,960 --> 00:11:03,110
+information you get from this opening
+guess is as good as chopping your space
+
+708
+00:11:03,110 --> 00:11:03,120
+guess is as good as chopping your space
+ 
+
+709
+00:11:03,120 --> 00:11:04,950
+guess is as good as chopping your space
+of possibilities in half about five
+
+710
+00:11:04,950 --> 00:11:04,960
+of possibilities in half about five
+ 
+
+711
+00:11:04,960 --> 00:11:07,070
+of possibilities in half about five
+times. By contrast, an example of a
+
+712
+00:11:07,070 --> 00:11:07,080
+times. By contrast, an example of a
+ 
+
+713
+00:11:07,080 --> 00:11:09,190
+times. By contrast, an example of a
+guess with a higher expected information
+
+714
+00:11:09,190 --> 00:11:09,200
+guess with a higher expected information
+ 
+
+715
+00:11:09,200 --> 00:11:13,070
+guess with a higher expected information
+value would be something like slate.
+
+716
+00:11:13,070 --> 00:11:13,080
+value would be something like slate.
+ 
+
+717
+00:11:13,080 --> 00:11:13,950
+value would be something like slate.
+In this case, you'll notice the
+
+718
+00:11:13,950 --> 00:11:13,960
+In this case, you'll notice the
+ 
+
+719
+00:11:13,960 --> 00:11:16,110
+In this case, you'll notice the
+distribution looks a lot flatter. In
+
+720
+00:11:16,110 --> 00:11:16,120
+distribution looks a lot flatter. In
+ 
+
+721
+00:11:16,120 --> 00:11:17,950
+distribution looks a lot flatter. In
+particular, the most probable occurrence
+
+722
+00:11:17,950 --> 00:11:17,960
+particular, the most probable occurrence
+ 
+
+723
+00:11:17,960 --> 00:11:20,590
+particular, the most probable occurrence
+of all grays only has about a 6% chance
+
+724
+00:11:20,590 --> 00:11:20,600
+of all grays only has about a 6% chance
+ 
+
+725
+00:11:20,600 --> 00:11:22,550
+of all grays only has about a 6% chance
+of occurring. So, at minimum, you're
+
+726
+00:11:22,550 --> 00:11:22,560
+of occurring. So, at minimum, you're
+ 
+
+727
+00:11:22,560 --> 00:11:24,590
+of occurring. So, at minimum, you're
+getting evidently 3.9 bits of
+
+728
+00:11:24,590 --> 00:11:24,600
+getting evidently 3.9 bits of
+ 
+
+729
+00:11:24,600 --> 00:11:26,710
+getting evidently 3.9 bits of
+information. But that's a minimum. More
+
+730
+00:11:26,710 --> 00:11:26,720
+information. But that's a minimum. More
+ 
+
+731
+00:11:26,720 --> 00:11:27,990
+information. But that's a minimum. More
+typically, you'd get something better
+
+732
+00:11:27,990 --> 00:11:28,000
+typically, you'd get something better
+ 
+
+733
+00:11:28,000 --> 00:11:29,829
+typically, you'd get something better
+than that. And it turns out, when you
+
+734
+00:11:29,829 --> 00:11:29,839
+than that. And it turns out, when you
+ 
+
+735
+00:11:29,839 --> 00:11:31,310
+than that. And it turns out, when you
+crunch the numbers on this one and you
+
+736
+00:11:31,310 --> 00:11:31,320
+crunch the numbers on this one and you
+ 
+
+737
+00:11:31,320 --> 00:11:33,430
+crunch the numbers on this one and you
+add up all of the relevant terms, the
+
+738
+00:11:33,430 --> 00:11:33,440
+add up all of the relevant terms, the
+ 
+
+739
+00:11:33,440 --> 00:11:37,350
+add up all of the relevant terms, the
+average information is about 5.8.
+
+740
+00:11:37,350 --> 00:11:37,360
+average information is about 5.8.
+ 
+
+741
+00:11:37,360 --> 00:11:39,310
+average information is about 5.8.
+So, in contrast with weary, your space
+
+742
+00:11:39,310 --> 00:11:39,320
+So, in contrast with weary, your space
+ 
+
+743
+00:11:39,320 --> 00:11:41,030
+So, in contrast with weary, your space
+of possibilities will be about half as
+
+744
+00:11:41,030 --> 00:11:41,040
+of possibilities will be about half as
+ 
+
+745
+00:11:41,040 --> 00:11:44,430
+of possibilities will be about half as
+big after this first guess, on average.
+
+746
+00:11:44,430 --> 00:11:44,440
+big after this first guess, on average.
+ 
+
+747
+00:11:44,440 --> 00:11:45,670
+big after this first guess, on average.
+There's actually a fun story about the
+
+748
+00:11:45,670 --> 00:11:45,680
+There's actually a fun story about the
+ 
+
+749
+00:11:45,680 --> 00:11:47,310
+There's actually a fun story about the
+name for this expected value of
+
+750
+00:11:47,310 --> 00:11:47,320
+name for this expected value of
+ 
+
+751
+00:11:47,320 --> 00:11:49,030
+name for this expected value of
+information quantity. You see,
+
+752
+00:11:49,030 --> 00:11:49,040
+information quantity. You see,
+ 
+
+753
+00:11:49,040 --> 00:11:50,510
+information quantity. You see,
+information theory was developed by
+
+754
+00:11:50,510 --> 00:11:50,520
+information theory was developed by
+ 
+
+755
+00:11:50,520 --> 00:11:52,030
+information theory was developed by
+Claude Shannon, who was working at Bell
+
+756
+00:11:52,030 --> 00:11:52,040
+Claude Shannon, who was working at Bell
+ 
+
+757
+00:11:52,040 --> 00:11:54,110
+Claude Shannon, who was working at Bell
+Labs in the 1940s, but he was talking
+
+758
+00:11:54,110 --> 00:11:54,120
+Labs in the 1940s, but he was talking
+ 
+
+759
+00:11:54,120 --> 00:11:55,630
+Labs in the 1940s, but he was talking
+about some of his yet-to-be-published
+
+760
+00:11:55,630 --> 00:11:55,640
+about some of his yet-to-be-published
+ 
+
+761
+00:11:55,640 --> 00:11:57,750
+about some of his yet-to-be-published
+ideas with John von Neumann, who was
+
+762
+00:11:57,750 --> 00:11:57,760
+ideas with John von Neumann, who was
+ 
+
+763
+00:11:57,760 --> 00:11:59,470
+ideas with John von Neumann, who was
+this intellectual giant of the time,
+
+764
+00:11:59,470 --> 00:11:59,480
+this intellectual giant of the time,
+ 
+
+765
+00:11:59,480 --> 00:12:01,470
+this intellectual giant of the time,
+very prominent in math physics and the
+
+766
+00:12:01,470 --> 00:12:01,480
+very prominent in math physics and the
+ 
+
+767
+00:12:01,480 --> 00:12:03,030
+very prominent in math physics and the
+beginnings of what was becoming computer
+
+768
+00:12:03,030 --> 00:12:03,040
+beginnings of what was becoming computer
+ 
+
+769
+00:12:03,040 --> 00:12:04,830
+beginnings of what was becoming computer
+science. And when he mentioned that he
+
+770
+00:12:04,830 --> 00:12:04,840
+science. And when he mentioned that he
+ 
+
+771
+00:12:04,840 --> 00:12:06,270
+science. And when he mentioned that he
+didn't really have a good name for this
+
+772
+00:12:06,270 --> 00:12:06,280
+didn't really have a good name for this
+ 
+
+773
+00:12:06,280 --> 00:12:08,790
+didn't really have a good name for this
+expected value of information quantity,
+
+774
+00:12:08,790 --> 00:12:08,800
+expected value of information quantity,
+ 
+
+775
+00:12:08,800 --> 00:12:10,710
+expected value of information quantity,
+von Neumann supposedly said, so the
+
+776
+00:12:10,710 --> 00:12:10,720
+von Neumann supposedly said, so the
+ 
+
+777
+00:12:10,720 --> 00:12:12,630
+von Neumann supposedly said, so the
+story goes, "Well, you should call it
+
+778
+00:12:12,630 --> 00:12:12,640
+story goes, "Well, you should call it
+ 
+
+779
+00:12:12,640 --> 00:12:14,750
+story goes, "Well, you should call it
+entropy." And for two reasons. In the
+
+780
+00:12:14,750 --> 00:12:14,760
+entropy." And for two reasons. In the
+ 
+
+781
+00:12:14,760 --> 00:12:16,430
+entropy." And for two reasons. In the
+first place, your uncertainty function
+
+782
+00:12:16,430 --> 00:12:16,440
+first place, your uncertainty function
+ 
+
+783
+00:12:16,440 --> 00:12:18,150
+first place, your uncertainty function
+has been used in statistical mechanics
+
+784
+00:12:18,150 --> 00:12:18,160
+has been used in statistical mechanics
+ 
+
+785
+00:12:18,160 --> 00:12:19,950
+has been used in statistical mechanics
+under that name, so it already has a
+
+786
+00:12:19,950 --> 00:12:19,960
+under that name, so it already has a
+ 
+
+787
+00:12:19,960 --> 00:12:21,990
+under that name, so it already has a
+name. And in the second place, and more
+
+788
+00:12:21,990 --> 00:12:22,000
+name. And in the second place, and more
+ 
+
+789
+00:12:22,000 --> 00:12:23,830
+name. And in the second place, and more
+important, nobody knows what entropy
+
+790
+00:12:23,830 --> 00:12:23,840
+important, nobody knows what entropy
+ 
+
+791
+00:12:23,840 --> 00:12:25,630
+important, nobody knows what entropy
+really is. So, in a debate, you'll
+
+792
+00:12:25,630 --> 00:12:25,640
+really is. So, in a debate, you'll
+ 
+
+793
+00:12:25,640 --> 00:12:27,630
+really is. So, in a debate, you'll
+always have the advantage.
+
+794
+00:12:27,630 --> 00:12:27,640
+always have the advantage.
+ 
+
+795
+00:12:27,640 --> 00:12:28,630
+always have the advantage.
+So, if the name seems a little bit
+
+796
+00:12:28,630 --> 00:12:28,640
+So, if the name seems a little bit
+ 
+
+797
+00:12:28,640 --> 00:12:30,590
+So, if the name seems a little bit
+mysterious, and if the story is to be
+
+798
+00:12:30,590 --> 00:12:30,600
+mysterious, and if the story is to be
+ 
+
+799
+00:12:30,600 --> 00:12:33,190
+mysterious, and if the story is to be
+believed, that's kind of by design.
+
+800
+00:12:33,190 --> 00:12:33,200
+believed, that's kind of by design.
+ 
+
+801
+00:12:33,200 --> 00:12:34,310
+believed, that's kind of by design.
+Also, if you're wondering about its
+
+802
+00:12:34,310 --> 00:12:34,320
+Also, if you're wondering about its
+ 
+
+803
+00:12:34,320 --> 00:12:36,070
+Also, if you're wondering about its
+relation to all of that second law of
+
+804
+00:12:36,070 --> 00:12:36,080
+relation to all of that second law of
+ 
+
+805
+00:12:36,080 --> 00:12:37,950
+relation to all of that second law of
+thermodynamics stuff from physics, there
+
+806
+00:12:37,950 --> 00:12:37,960
+thermodynamics stuff from physics, there
+ 
+
+807
+00:12:37,960 --> 00:12:39,750
+thermodynamics stuff from physics, there
+definitely is a connection, but in its
+
+808
+00:12:39,750 --> 00:12:39,760
+definitely is a connection, but in its
+ 
+
+809
+00:12:39,760 --> 00:12:41,470
+definitely is a connection, but in its
+origins, Shannon was just dealing with
+
+810
+00:12:41,470 --> 00:12:41,480
+origins, Shannon was just dealing with
+ 
+
+811
+00:12:41,480 --> 00:12:43,390
+origins, Shannon was just dealing with
+pure probability theory. And for our
+
+812
+00:12:43,390 --> 00:12:43,400
+pure probability theory. And for our
+ 
+
+813
+00:12:43,400 --> 00:12:44,950
+pure probability theory. And for our
+purposes here, when I use the word
+
+814
+00:12:44,950 --> 00:12:44,960
+purposes here, when I use the word
+ 
+
+815
+00:12:44,960 --> 00:12:46,630
+purposes here, when I use the word
+entropy, I just want you to think the
+
+816
+00:12:46,630 --> 00:12:46,640
+entropy, I just want you to think the
+ 
+
+817
+00:12:46,640 --> 00:12:48,630
+entropy, I just want you to think the
+expected information value of a
+
+818
+00:12:48,630 --> 00:12:48,640
+expected information value of a
+ 
+
+819
+00:12:48,640 --> 00:12:50,710
+expected information value of a
+particular guess.
+
+820
+00:12:50,710 --> 00:12:50,720
+particular guess.
+ 
+
+821
+00:12:50,720 --> 00:12:52,350
+particular guess.
+You can think of entropy as measuring
+
+822
+00:12:52,350 --> 00:12:52,360
+You can think of entropy as measuring
+ 
+
+823
+00:12:52,360 --> 00:12:54,790
+You can think of entropy as measuring
+two things simultaneously. The first one
+
+824
+00:12:54,790 --> 00:12:54,800
+two things simultaneously. The first one
+ 
+
+825
+00:12:54,800 --> 00:12:57,390
+two things simultaneously. The first one
+is how flat is the distribution. The
+
+826
+00:12:57,390 --> 00:12:57,400
+is how flat is the distribution. The
+ 
+
+827
+00:12:57,400 --> 00:12:59,670
+is how flat is the distribution. The
+closer a distribution is to uniform, the
+
+828
+00:12:59,670 --> 00:12:59,680
+closer a distribution is to uniform, the
+ 
+
+829
+00:12:59,680 --> 00:13:01,750
+closer a distribution is to uniform, the
+higher that entropy will be. In our
+
+830
+00:13:01,750 --> 00:13:01,760
+higher that entropy will be. In our
+ 
+
+831
+00:13:01,760 --> 00:13:03,230
+higher that entropy will be. In our
+case, where there are three to the fifth
+
+832
+00:13:03,230 --> 00:13:03,240
+case, where there are three to the fifth
+ 
+
+833
+00:13:03,240 --> 00:13:05,310
+case, where there are three to the fifth
+total patterns, for a uniform
+
+834
+00:13:05,310 --> 00:13:05,320
+total patterns, for a uniform
+ 
+
+835
+00:13:05,320 --> 00:13:07,750
+total patterns, for a uniform
+distribution, observing any one of them
+
+836
+00:13:07,750 --> 00:13:07,760
+distribution, observing any one of them
+ 
+
+837
+00:13:07,760 --> 00:13:09,790
+distribution, observing any one of them
+would have information log base two of
+
+838
+00:13:09,790 --> 00:13:09,800
+would have information log base two of
+ 
+
+839
+00:13:09,800 --> 00:13:11,550
+would have information log base two of
+three to the fifth, which happens to be
+
+840
+00:13:11,550 --> 00:13:11,560
+three to the fifth, which happens to be
+ 
+
+841
+00:13:11,560 --> 00:13:13,110
+three to the fifth, which happens to be
+7.92.
+
+842
+00:13:13,110 --> 00:13:13,120
+7.92.
+ 
+
+843
+00:13:13,120 --> 00:13:14,950
+7.92.
+So, that is the absolute maximum that
+
+844
+00:13:14,950 --> 00:13:14,960
+So, that is the absolute maximum that
+ 
+
+845
+00:13:14,960 --> 00:13:16,750
+So, that is the absolute maximum that
+you could possibly have for this
+
+846
+00:13:16,750 --> 00:13:16,760
+you could possibly have for this
+ 
+
+847
+00:13:16,760 --> 00:13:19,070
+you could possibly have for this
+entropy. But, entropy is also kind of a
+
+848
+00:13:19,070 --> 00:13:19,080
+entropy. But, entropy is also kind of a
+ 
+
+849
+00:13:19,080 --> 00:13:21,030
+entropy. But, entropy is also kind of a
+measure of how many possibilities there
+
+850
+00:13:21,030 --> 00:13:21,040
+measure of how many possibilities there
+ 
+
+851
+00:13:21,040 --> 00:13:22,790
+measure of how many possibilities there
+are in the first place. For example, if
+
+852
+00:13:22,790 --> 00:13:22,800
+are in the first place. For example, if
+ 
+
+853
+00:13:22,800 --> 00:13:24,310
+are in the first place. For example, if
+you happen to have some word where
+
+854
+00:13:24,310 --> 00:13:24,320
+you happen to have some word where
+ 
+
+855
+00:13:24,320 --> 00:13:26,950
+you happen to have some word where
+there's only 16 possible patterns, and
+
+856
+00:13:26,950 --> 00:13:26,960
+there's only 16 possible patterns, and
+ 
+
+857
+00:13:26,960 --> 00:13:28,950
+there's only 16 possible patterns, and
+each one is equally likely. This
+
+858
+00:13:28,950 --> 00:13:28,960
+each one is equally likely. This
+ 
+
+859
+00:13:28,960 --> 00:13:31,110
+each one is equally likely. This
+entropy, this expected information,
+
+860
+00:13:31,110 --> 00:13:31,120
+entropy, this expected information,
+ 
+
+861
+00:13:31,120 --> 00:13:33,070
+entropy, this expected information,
+would be four bits. But, if you have
+
+862
+00:13:33,070 --> 00:13:33,080
+would be four bits. But, if you have
+ 
+
+863
+00:13:33,080 --> 00:13:35,030
+would be four bits. But, if you have
+another word where there's 64 possible
+
+864
+00:13:35,030 --> 00:13:35,040
+another word where there's 64 possible
+ 
+
+865
+00:13:35,040 --> 00:13:36,870
+another word where there's 64 possible
+patterns that could come up, and they're
+
+866
+00:13:36,870 --> 00:13:36,880
+patterns that could come up, and they're
+ 
+
+867
+00:13:36,880 --> 00:13:38,790
+patterns that could come up, and they're
+all equally likely, then the entropy
+
+868
+00:13:38,790 --> 00:13:38,800
+all equally likely, then the entropy
+ 
+
+869
+00:13:38,800 --> 00:13:41,390
+all equally likely, then the entropy
+would work out to be six bits.
+
+870
+00:13:41,390 --> 00:13:41,400
+would work out to be six bits.
+ 
+
+871
+00:13:41,400 --> 00:13:42,910
+would work out to be six bits.
+So, if you see some distribution out in
+
+872
+00:13:42,910 --> 00:13:42,920
+So, if you see some distribution out in
+ 
+
+873
+00:13:42,920 --> 00:13:44,950
+So, if you see some distribution out in
+the wild that has an entropy of six
+
+874
+00:13:44,950 --> 00:13:44,960
+the wild that has an entropy of six
+ 
+
+875
+00:13:44,960 --> 00:13:46,510
+the wild that has an entropy of six
+bits, it's sort of like it's saying
+
+876
+00:13:46,510 --> 00:13:46,520
+bits, it's sort of like it's saying
+ 
+
+877
+00:13:46,520 --> 00:13:48,870
+bits, it's sort of like it's saying
+there's as much variation and
+
+878
+00:13:48,870 --> 00:13:48,880
+there's as much variation and
+ 
+
+879
+00:13:48,880 --> 00:13:51,030
+there's as much variation and
+uncertainty in what's about to happen as
+
+880
+00:13:51,030 --> 00:13:51,040
+uncertainty in what's about to happen as
+ 
+
+881
+00:13:51,040 --> 00:13:52,910
+uncertainty in what's about to happen as
+if there were 64 equally likely
+
+882
+00:13:52,910 --> 00:13:52,920
+if there were 64 equally likely
+ 
+
+883
+00:13:52,920 --> 00:13:54,270
+if there were 64 equally likely
+outcomes.
+
+884
+00:13:54,270 --> 00:13:54,280
+outcomes.
+ 
+
+885
+00:13:54,280 --> 00:13:56,190
+outcomes.
+For my first pass at the Wordle bot, I
+
+886
+00:13:56,190 --> 00:13:56,200
+For my first pass at the Wordle bot, I
+ 
+
+887
+00:13:56,200 --> 00:13:58,550
+For my first pass at the Wordle bot, I
+basically had it just do this. It goes
+
+888
+00:13:58,550 --> 00:13:58,560
+basically had it just do this. It goes
+ 
+
+889
+00:13:58,560 --> 00:14:00,350
+basically had it just do this. It goes
+through all of the different possible
+
+890
+00:14:00,350 --> 00:14:00,360
+through all of the different possible
+ 
+
+891
+00:14:00,360 --> 00:14:02,270
+through all of the different possible
+guesses that you could have, all 13,000
+
+892
+00:14:02,270 --> 00:14:02,280
+guesses that you could have, all 13,000
+ 
+
+893
+00:14:02,280 --> 00:14:04,550
+guesses that you could have, all 13,000
+words. It computes the entropy for each
+
+894
+00:14:04,550 --> 00:14:04,560
+words. It computes the entropy for each
+ 
+
+895
+00:14:04,560 --> 00:14:06,910
+words. It computes the entropy for each
+one, or more specifically, the entropy
+
+896
+00:14:06,910 --> 00:14:06,920
+one, or more specifically, the entropy
+ 
+
+897
+00:14:06,920 --> 00:14:08,990
+one, or more specifically, the entropy
+of the distribution across all patterns
+
+898
+00:14:08,990 --> 00:14:09,000
+of the distribution across all patterns
+ 
+
+899
+00:14:09,000 --> 00:14:11,230
+of the distribution across all patterns
+that you might see for each one, and
+
+900
+00:14:11,230 --> 00:14:11,240
+that you might see for each one, and
+ 
+
+901
+00:14:11,240 --> 00:14:12,630
+that you might see for each one, and
+then it picks the highest, since that's
+
+902
+00:14:12,630 --> 00:14:12,640
+then it picks the highest, since that's
+ 
+
+903
+00:14:12,640 --> 00:14:14,030
+then it picks the highest, since that's
+the one that's likely to chop down your
+
+904
+00:14:14,030 --> 00:14:14,040
+the one that's likely to chop down your
+ 
+
+905
+00:14:14,040 --> 00:14:15,550
+the one that's likely to chop down your
+space of possibilities as much as
+
+906
+00:14:15,550 --> 00:14:15,560
+space of possibilities as much as
+ 
+
+907
+00:14:15,560 --> 00:14:17,070
+space of possibilities as much as
+possible.
+
+908
+00:14:17,070 --> 00:14:17,080
+possible.
+ 
+
+909
+00:14:17,080 --> 00:14:18,150
+possible.
+And even though I've only been talking
+
+910
+00:14:18,150 --> 00:14:18,160
+And even though I've only been talking
+ 
+
+911
+00:14:18,160 --> 00:14:19,670
+And even though I've only been talking
+about the first guess here, it does the
+
+912
+00:14:19,670 --> 00:14:19,680
+about the first guess here, it does the
+ 
+
+913
+00:14:19,680 --> 00:14:21,590
+about the first guess here, it does the
+same thing for the next few guesses. For
+
+914
+00:14:21,590 --> 00:14:21,600
+same thing for the next few guesses. For
+ 
+
+915
+00:14:21,600 --> 00:14:23,310
+same thing for the next few guesses. For
+example, after you see some pattern on
+
+916
+00:14:23,310 --> 00:14:23,320
+example, after you see some pattern on
+ 
+
+917
+00:14:23,320 --> 00:14:24,950
+example, after you see some pattern on
+that first guess, which would restrict
+
+918
+00:14:24,950 --> 00:14:24,960
+that first guess, which would restrict
+ 
+
+919
+00:14:24,960 --> 00:14:26,590
+that first guess, which would restrict
+you to a smaller number of possible
+
+920
+00:14:26,590 --> 00:14:26,600
+you to a smaller number of possible
+ 
+
+921
+00:14:26,600 --> 00:14:28,750
+you to a smaller number of possible
+words based on what matches with that,
+
+922
+00:14:28,750 --> 00:14:28,760
+words based on what matches with that,
+ 
+
+923
+00:14:28,760 --> 00:14:30,430
+words based on what matches with that,
+you just play the same game with respect
+
+924
+00:14:30,430 --> 00:14:30,440
+you just play the same game with respect
+ 
+
+925
+00:14:30,440 --> 00:14:32,310
+you just play the same game with respect
+to that smaller set of words. For a
+
+926
+00:14:32,310 --> 00:14:32,320
+to that smaller set of words. For a
+ 
+
+927
+00:14:32,320 --> 00:14:33,829
+to that smaller set of words. For a
+proposed second guess, you look at the
+
+928
+00:14:33,829 --> 00:14:33,839
+proposed second guess, you look at the
+ 
+
+929
+00:14:33,839 --> 00:14:35,950
+proposed second guess, you look at the
+distribution of all patterns that could
+
+930
+00:14:35,950 --> 00:14:35,960
+distribution of all patterns that could
+ 
+
+931
+00:14:35,960 --> 00:14:37,590
+distribution of all patterns that could
+occur from that more restricted set of
+
+932
+00:14:37,590 --> 00:14:37,600
+occur from that more restricted set of
+ 
+
+933
+00:14:37,600 --> 00:14:38,990
+occur from that more restricted set of
+words.
+
+934
+00:14:38,990 --> 00:14:39,000
+words.
+ 
+
+935
+00:14:39,000 --> 00:14:40,510
+words.
+You search through all 13,000
+
+936
+00:14:40,510 --> 00:14:40,520
+You search through all 13,000
+ 
+
+937
+00:14:40,520 --> 00:14:42,070
+You search through all 13,000
+possibilities, and you find the one that
+
+938
+00:14:42,070 --> 00:14:42,080
+possibilities, and you find the one that
+ 
+
+939
+00:14:42,080 --> 00:14:45,310
+possibilities, and you find the one that
+maximizes that entropy.
+
+940
+00:14:45,310 --> 00:14:45,320
+maximizes that entropy.
+ 
+
+941
+00:14:45,320 --> 00:14:46,790
+maximizes that entropy.
+To show you how this works in action,
+
+942
+00:14:46,790 --> 00:14:46,800
+To show you how this works in action,
+ 
+
+943
+00:14:46,800 --> 00:14:48,630
+To show you how this works in action,
+let me just pull up a little variant of
+
+944
+00:14:48,630 --> 00:14:48,640
+let me just pull up a little variant of
+ 
+
+945
+00:14:48,640 --> 00:14:50,030
+let me just pull up a little variant of
+Wordle that I wrote that shows the
+
+946
+00:14:50,030 --> 00:14:50,040
+Wordle that I wrote that shows the
+ 
+
+947
+00:14:50,040 --> 00:14:51,550
+Wordle that I wrote that shows the
+highlights of this analysis in the
+
+948
+00:14:51,550 --> 00:14:51,560
+highlights of this analysis in the
+ 
+
+949
+00:14:51,560 --> 00:14:53,870
+highlights of this analysis in the
+margins.
+
+950
+00:14:53,870 --> 00:14:53,880
+margins.
+ 
+
+951
+00:14:53,880 --> 00:14:55,230
+margins.
+So, after doing all its entropy
+
+952
+00:14:55,230 --> 00:14:55,240
+So, after doing all its entropy
+ 
+
+953
+00:14:55,240 --> 00:14:56,550
+So, after doing all its entropy
+calculations on the right here, it's
+
+954
+00:14:56,550 --> 00:14:56,560
+calculations on the right here, it's
+ 
+
+955
+00:14:56,560 --> 00:14:58,470
+calculations on the right here, it's
+showing us which ones have the highest
+
+956
+00:14:58,470 --> 00:14:58,480
+showing us which ones have the highest
+ 
+
+957
+00:14:58,480 --> 00:15:00,750
+showing us which ones have the highest
+expected information. Turns out the top
+
+958
+00:15:00,750 --> 00:15:00,760
+expected information. Turns out the top
+ 
+
+959
+00:15:00,760 --> 00:15:02,070
+expected information. Turns out the top
+answer, at least at the moment, we'll
+
+960
+00:15:02,070 --> 00:15:02,080
+answer, at least at the moment, we'll
+ 
+
+961
+00:15:02,080 --> 00:15:04,829
+answer, at least at the moment, we'll
+refine this later, is "tares",
+
+962
+00:15:04,829 --> 00:15:04,839
+refine this later, is "tares",
+ 
+
+963
+00:15:04,839 --> 00:15:06,390
+refine this later, is "tares",
+which means,
+
+964
+00:15:06,390 --> 00:15:06,400
+which means,
+ 
+
+965
+00:15:06,400 --> 00:15:07,390
+which means,
+um,
+
+966
+00:15:07,390 --> 00:15:07,400
+um,
+ 
+
+967
+00:15:07,400 --> 00:15:09,829
+um,
+of course, "avetch", the most common
+
+968
+00:15:09,829 --> 00:15:09,839
+of course, "avetch", the most common
+ 
+
+969
+00:15:09,839 --> 00:15:10,990
+of course, "avetch", the most common
+vetch.
+
+970
+00:15:10,990 --> 00:15:11,000
+vetch.
+ 
+
+971
+00:15:11,000 --> 00:15:12,390
+vetch.
+Each time we make a guess here, where
+
+972
+00:15:12,390 --> 00:15:12,400
+Each time we make a guess here, where
+ 
+
+973
+00:15:12,400 --> 00:15:13,310
+Each time we make a guess here, where
+maybe I kind of ignore its
+
+974
+00:15:13,310 --> 00:15:13,320
+maybe I kind of ignore its
+ 
+
+975
+00:15:13,320 --> 00:15:14,990
+maybe I kind of ignore its
+recommendations and go with "slate" cuz
+
+976
+00:15:14,990 --> 00:15:15,000
+recommendations and go with "slate" cuz
+ 
+
+977
+00:15:15,000 --> 00:15:17,230
+recommendations and go with "slate" cuz
+I like slate. We can see how much
+
+978
+00:15:17,230 --> 00:15:17,240
+I like slate. We can see how much
+ 
+
+979
+00:15:17,240 --> 00:15:19,430
+I like slate. We can see how much
+expected information it had, but then on
+
+980
+00:15:19,430 --> 00:15:19,440
+expected information it had, but then on
+ 
+
+981
+00:15:19,440 --> 00:15:20,630
+expected information it had, but then on
+the right of the word here, it's showing
+
+982
+00:15:20,630 --> 00:15:20,640
+the right of the word here, it's showing
+ 
+
+983
+00:15:20,640 --> 00:15:22,950
+the right of the word here, it's showing
+us how much actual information we got
+
+984
+00:15:22,950 --> 00:15:22,960
+us how much actual information we got
+ 
+
+985
+00:15:22,960 --> 00:15:25,110
+us how much actual information we got
+given this particular pattern. So, here
+
+986
+00:15:25,110 --> 00:15:25,120
+given this particular pattern. So, here
+ 
+
+987
+00:15:25,120 --> 00:15:26,670
+given this particular pattern. So, here
+it looks like we were a little unlucky.
+
+988
+00:15:26,670 --> 00:15:26,680
+it looks like we were a little unlucky.
+ 
+
+989
+00:15:26,680 --> 00:15:28,390
+it looks like we were a little unlucky.
+We were expected to get 5.8, but we
+
+990
+00:15:28,390 --> 00:15:28,400
+We were expected to get 5.8, but we
+ 
+
+991
+00:15:28,400 --> 00:15:29,630
+We were expected to get 5.8, but we
+happened to get something with less than
+
+992
+00:15:29,630 --> 00:15:29,640
+happened to get something with less than
+ 
+
+993
+00:15:29,640 --> 00:15:31,590
+happened to get something with less than
+that. And then on the left side here,
+
+994
+00:15:31,590 --> 00:15:31,600
+that. And then on the left side here,
+ 
+
+995
+00:15:31,600 --> 00:15:32,790
+that. And then on the left side here,
+it's showing us all of the different
+
+996
+00:15:32,790 --> 00:15:32,800
+it's showing us all of the different
+ 
+
+997
+00:15:32,800 --> 00:15:35,750
+it's showing us all of the different
+possible words given where we are now.
+
+998
+00:15:35,750 --> 00:15:35,760
+possible words given where we are now.
+ 
+
+999
+00:15:35,760 --> 00:15:37,470
+possible words given where we are now.
+The blue bars are telling us how likely
+
+1000
+00:15:37,470 --> 00:15:37,480
+The blue bars are telling us how likely
+ 
+
+1001
+00:15:37,480 --> 00:15:39,270
+The blue bars are telling us how likely
+it thinks each word is. So, at the
+
+1002
+00:15:39,270 --> 00:15:39,280
+it thinks each word is. So, at the
+ 
+
+1003
+00:15:39,280 --> 00:15:40,630
+it thinks each word is. So, at the
+moment, it's assuming each word is
+
+1004
+00:15:40,630 --> 00:15:40,640
+moment, it's assuming each word is
+ 
+
+1005
+00:15:40,640 --> 00:15:42,230
+moment, it's assuming each word is
+equally likely to occur, but we'll
+
+1006
+00:15:42,230 --> 00:15:42,240
+equally likely to occur, but we'll
+ 
+
+1007
+00:15:42,240 --> 00:15:43,990
+equally likely to occur, but we'll
+refine that in a moment.
+
+1008
+00:15:43,990 --> 00:15:44,000
+refine that in a moment.
+ 
+
+1009
+00:15:44,000 --> 00:15:45,430
+refine that in a moment.
+And then this uncertainty measurement is
+
+1010
+00:15:45,430 --> 00:15:45,440
+And then this uncertainty measurement is
+ 
+
+1011
+00:15:45,440 --> 00:15:47,430
+And then this uncertainty measurement is
+telling us the entropy of this
+
+1012
+00:15:47,430 --> 00:15:47,440
+telling us the entropy of this
+ 
+
+1013
+00:15:47,440 --> 00:15:49,950
+telling us the entropy of this
+distribution across the possible words,
+
+1014
+00:15:49,950 --> 00:15:49,960
+distribution across the possible words,
+ 
+
+1015
+00:15:49,960 --> 00:15:51,670
+distribution across the possible words,
+which right now, because it's a uniform
+
+1016
+00:15:51,670 --> 00:15:51,680
+which right now, because it's a uniform
+ 
+
+1017
+00:15:51,680 --> 00:15:53,310
+which right now, because it's a uniform
+distribution, is just a needlessly
+
+1018
+00:15:53,310 --> 00:15:53,320
+distribution, is just a needlessly
+ 
+
+1019
+00:15:53,320 --> 00:15:55,230
+distribution, is just a needlessly
+complicated way to count the number of
+
+1020
+00:15:55,230 --> 00:15:55,240
+complicated way to count the number of
+ 
+
+1021
+00:15:55,240 --> 00:15:57,070
+complicated way to count the number of
+possibilities. For example, if we were
+
+1022
+00:15:57,070 --> 00:15:57,080
+possibilities. For example, if we were
+ 
+
+1023
+00:15:57,080 --> 00:15:59,990
+possibilities. For example, if we were
+to take 2 to the power of 13.66,
+
+1024
+00:15:59,990 --> 00:16:00,000
+to take 2 to the power of 13.66,
+ 
+
+1025
+00:16:00,000 --> 00:16:01,470
+to take 2 to the power of 13.66,
+that should be around the 13,000
+
+1026
+00:16:01,470 --> 00:16:01,480
+that should be around the 13,000
+ 
+
+1027
+00:16:01,480 --> 00:16:03,870
+that should be around the 13,000
+possibilities. Um a little bit off here,
+
+1028
+00:16:03,870 --> 00:16:03,880
+possibilities. Um a little bit off here,
+ 
+
+1029
+00:16:03,880 --> 00:16:05,310
+possibilities. Um a little bit off here,
+but only because I'm not showing all the
+
+1030
+00:16:05,310 --> 00:16:05,320
+but only because I'm not showing all the
+ 
+
+1031
+00:16:05,320 --> 00:16:07,270
+but only because I'm not showing all the
+decimal places. At the moment, that
+
+1032
+00:16:07,270 --> 00:16:07,280
+decimal places. At the moment, that
+ 
+
+1033
+00:16:07,280 --> 00:16:08,670
+decimal places. At the moment, that
+might feel redundant and like it's
+
+1034
+00:16:08,670 --> 00:16:08,680
+might feel redundant and like it's
+ 
+
+1035
+00:16:08,680 --> 00:16:10,310
+might feel redundant and like it's
+overly complicating things, but you'll
+
+1036
+00:16:10,310 --> 00:16:10,320
+overly complicating things, but you'll
+ 
+
+1037
+00:16:10,320 --> 00:16:11,790
+overly complicating things, but you'll
+see why it's useful to have both numbers
+
+1038
+00:16:11,790 --> 00:16:11,800
+see why it's useful to have both numbers
+ 
+
+1039
+00:16:11,800 --> 00:16:13,430
+see why it's useful to have both numbers
+in a minute. So, here it looks like it's
+
+1040
+00:16:13,430 --> 00:16:13,440
+in a minute. So, here it looks like it's
+ 
+
+1041
+00:16:13,440 --> 00:16:14,870
+in a minute. So, here it looks like it's
+suggesting the highest entropy for our
+
+1042
+00:16:14,870 --> 00:16:14,880
+suggesting the highest entropy for our
+ 
+
+1043
+00:16:14,880 --> 00:16:17,950
+suggesting the highest entropy for our
+second guess is ramen, which again just
+
+1044
+00:16:17,950 --> 00:16:17,960
+second guess is ramen, which again just
+ 
+
+1045
+00:16:17,960 --> 00:16:21,190
+second guess is ramen, which again just
+really doesn't feel like a word. So,
+
+1046
+00:16:21,190 --> 00:16:21,200
+really doesn't feel like a word. So,
+ 
+
+1047
+00:16:21,200 --> 00:16:22,470
+really doesn't feel like a word. So,
+to take the moral high ground here, I'm
+
+1048
+00:16:22,470 --> 00:16:22,480
+to take the moral high ground here, I'm
+ 
+
+1049
+00:16:22,480 --> 00:16:25,430
+to take the moral high ground here, I'm
+going to go ahead and type in reins.
+
+1050
+00:16:25,430 --> 00:16:25,440
+going to go ahead and type in reins.
+ 
+
+1051
+00:16:25,440 --> 00:16:26,590
+going to go ahead and type in reins.
+And again, it looks like we were a
+
+1052
+00:16:26,590 --> 00:16:26,600
+And again, it looks like we were a
+ 
+
+1053
+00:16:26,600 --> 00:16:28,630
+And again, it looks like we were a
+little unlucky. We were expecting 4.3
+
+1054
+00:16:28,630 --> 00:16:28,640
+little unlucky. We were expecting 4.3
+ 
+
+1055
+00:16:28,640 --> 00:16:30,750
+little unlucky. We were expecting 4.3
+bits, and we only got 3.39 bits of
+
+1056
+00:16:30,750 --> 00:16:30,760
+bits, and we only got 3.39 bits of
+ 
+
+1057
+00:16:30,760 --> 00:16:31,950
+bits, and we only got 3.39 bits of
+information.
+
+1058
+00:16:31,950 --> 00:16:31,960
+information.
+ 
+
+1059
+00:16:31,960 --> 00:16:33,270
+information.
+So, that takes us down to 55
+
+1060
+00:16:33,270 --> 00:16:33,280
+So, that takes us down to 55
+ 
+
+1061
+00:16:33,280 --> 00:16:34,710
+So, that takes us down to 55
+possibilities.
+
+1062
+00:16:34,710 --> 00:16:34,720
+possibilities.
+ 
+
+1063
+00:16:34,720 --> 00:16:36,550
+possibilities.
+And here, maybe I'll just actually go
+
+1064
+00:16:36,550 --> 00:16:36,560
+And here, maybe I'll just actually go
+ 
+
+1065
+00:16:36,560 --> 00:16:37,910
+And here, maybe I'll just actually go
+with what it's suggesting, which is
+
+1066
+00:16:37,910 --> 00:16:37,920
+with what it's suggesting, which is
+ 
+
+1067
+00:16:37,920 --> 00:16:40,790
+with what it's suggesting, which is
+cambu, whatever that means. And okay,
+
+1068
+00:16:40,790 --> 00:16:40,800
+cambu, whatever that means. And okay,
+ 
+
+1069
+00:16:40,800 --> 00:16:42,510
+cambu, whatever that means. And okay,
+this is actually um a good chance for a
+
+1070
+00:16:42,510 --> 00:16:42,520
+this is actually um a good chance for a
+ 
+
+1071
+00:16:42,520 --> 00:16:44,110
+this is actually um a good chance for a
+puzzle. It's telling us this pattern
+
+1072
+00:16:44,110 --> 00:16:44,120
+puzzle. It's telling us this pattern
+ 
+
+1073
+00:16:44,120 --> 00:16:46,990
+puzzle. It's telling us this pattern
+gives us 4.7 bits of information. But
+
+1074
+00:16:46,990 --> 00:16:47,000
+gives us 4.7 bits of information. But
+ 
+
+1075
+00:16:47,000 --> 00:16:48,790
+gives us 4.7 bits of information. But
+over on the left, before we see that
+
+1076
+00:16:48,790 --> 00:16:48,800
+over on the left, before we see that
+ 
+
+1077
+00:16:48,800 --> 00:16:51,030
+over on the left, before we see that
+pattern, there were 5.78 bits of
+
+1078
+00:16:51,030 --> 00:16:51,040
+pattern, there were 5.78 bits of
+ 
+
+1079
+00:16:51,040 --> 00:16:53,750
+pattern, there were 5.78 bits of
+uncertainty. So, as a quiz for you, what
+
+1080
+00:16:53,750 --> 00:16:53,760
+uncertainty. So, as a quiz for you, what
+ 
+
+1081
+00:16:53,760 --> 00:16:55,190
+uncertainty. So, as a quiz for you, what
+does that mean about the number of
+
+1082
+00:16:55,190 --> 00:16:55,200
+does that mean about the number of
+ 
+
+1083
+00:16:55,200 --> 00:16:57,910
+does that mean about the number of
+remaining possibilities?
+
+1084
+00:16:57,910 --> 00:16:57,920
+remaining possibilities?
+ 
+
+1085
+00:16:57,920 --> 00:16:59,670
+remaining possibilities?
+Well, it means that we're reduced down
+
+1086
+00:16:59,670 --> 00:16:59,680
+Well, it means that we're reduced down
+ 
+
+1087
+00:16:59,680 --> 00:17:01,990
+Well, it means that we're reduced down
+to one bit of uncertainty, which is the
+
+1088
+00:17:01,990 --> 00:17:02,000
+to one bit of uncertainty, which is the
+ 
+
+1089
+00:17:02,000 --> 00:17:03,670
+to one bit of uncertainty, which is the
+same thing as saying that there's two
+
+1090
+00:17:03,670 --> 00:17:03,680
+same thing as saying that there's two
+ 
+
+1091
+00:17:03,680 --> 00:17:06,390
+same thing as saying that there's two
+possible answers. It's a 50/50 choice.
+
+1092
+00:17:06,390 --> 00:17:06,400
+possible answers. It's a 50/50 choice.
+ 
+
+1093
+00:17:06,400 --> 00:17:07,910
+possible answers. It's a 50/50 choice.
+And from here, because you and I know
+
+1094
+00:17:07,910 --> 00:17:07,920
+And from here, because you and I know
+ 
+
+1095
+00:17:07,920 --> 00:17:09,309
+And from here, because you and I know
+which words are more common, we know
+
+1096
+00:17:09,309 --> 00:17:09,319
+which words are more common, we know
+ 
+
+1097
+00:17:09,319 --> 00:17:11,309
+which words are more common, we know
+that the answer should be abyss, but as
+
+1098
+00:17:11,309 --> 00:17:11,319
+that the answer should be abyss, but as
+ 
+
+1099
+00:17:11,319 --> 00:17:12,470
+that the answer should be abyss, but as
+it's written right now, the program
+
+1100
+00:17:12,470 --> 00:17:12,480
+it's written right now, the program
+ 
+
+1101
+00:17:12,480 --> 00:17:14,189
+it's written right now, the program
+doesn't know that. So, it just keeps
+
+1102
+00:17:14,189 --> 00:17:14,199
+doesn't know that. So, it just keeps
+ 
+
+1103
+00:17:14,199 --> 00:17:15,829
+doesn't know that. So, it just keeps
+going trying to gain as much information
+
+1104
+00:17:15,829 --> 00:17:15,839
+going trying to gain as much information
+ 
+
+1105
+00:17:15,839 --> 00:17:17,829
+going trying to gain as much information
+as it can until it's only one
+
+1106
+00:17:17,829 --> 00:17:17,839
+as it can until it's only one
+ 
+
+1107
+00:17:17,839 --> 00:17:20,270
+as it can until it's only one
+possibility left and then it guesses it.
+
+1108
+00:17:20,270 --> 00:17:20,280
+possibility left and then it guesses it.
+ 
+
+1109
+00:17:20,280 --> 00:17:21,790
+possibility left and then it guesses it.
+So, obviously we need a better end game
+
+1110
+00:17:21,790 --> 00:17:21,800
+So, obviously we need a better end game
+ 
+
+1111
+00:17:21,800 --> 00:17:23,470
+So, obviously we need a better end game
+strategy, but let's say we call this
+
+1112
+00:17:23,470 --> 00:17:23,480
+strategy, but let's say we call this
+ 
+
+1113
+00:17:23,480 --> 00:17:25,670
+strategy, but let's say we call this
+version one of our Wordle solver and
+
+1114
+00:17:25,670 --> 00:17:25,680
+version one of our Wordle solver and
+ 
+
+1115
+00:17:25,680 --> 00:17:27,390
+version one of our Wordle solver and
+then we go and run some simulations to
+
+1116
+00:17:27,390 --> 00:17:27,400
+then we go and run some simulations to
+ 
+
+1117
+00:17:27,400 --> 00:17:30,590
+then we go and run some simulations to
+see how it does.
+
+1118
+00:17:30,590 --> 00:17:30,600
+
+ 
+
+1119
+00:17:30,600 --> 00:17:31,990
+
+So, the way this is working is it's
+
+1120
+00:17:31,990 --> 00:17:32,000
+So, the way this is working is it's
+ 
+
+1121
+00:17:32,000 --> 00:17:34,190
+So, the way this is working is it's
+playing every possible Wordle game. It's
+
+1122
+00:17:34,190 --> 00:17:34,200
+playing every possible Wordle game. It's
+ 
+
+1123
+00:17:34,200 --> 00:17:36,950
+playing every possible Wordle game. It's
+going through all of those 2315 words
+
+1124
+00:17:36,950 --> 00:17:36,960
+going through all of those 2315 words
+ 
+
+1125
+00:17:36,960 --> 00:17:38,750
+going through all of those 2315 words
+that are the actual Wordle answers. It's
+
+1126
+00:17:38,750 --> 00:17:38,760
+that are the actual Wordle answers. It's
+ 
+
+1127
+00:17:38,760 --> 00:17:41,190
+that are the actual Wordle answers. It's
+basically using that as a testing set.
+
+1128
+00:17:41,190 --> 00:17:41,200
+basically using that as a testing set.
+ 
+
+1129
+00:17:41,200 --> 00:17:42,750
+basically using that as a testing set.
+And with this naive method of not
+
+1130
+00:17:42,750 --> 00:17:42,760
+And with this naive method of not
+ 
+
+1131
+00:17:42,760 --> 00:17:44,750
+And with this naive method of not
+considering how common a word is and
+
+1132
+00:17:44,750 --> 00:17:44,760
+considering how common a word is and
+ 
+
+1133
+00:17:44,760 --> 00:17:46,470
+considering how common a word is and
+just trying to maximize the information
+
+1134
+00:17:46,470 --> 00:17:46,480
+just trying to maximize the information
+ 
+
+1135
+00:17:46,480 --> 00:17:48,270
+just trying to maximize the information
+at each step along the way until it gets
+
+1136
+00:17:48,270 --> 00:17:48,280
+at each step along the way until it gets
+ 
+
+1137
+00:17:48,280 --> 00:17:50,390
+at each step along the way until it gets
+down to one and only one choice.
+
+1138
+00:17:50,390 --> 00:17:50,400
+down to one and only one choice.
+ 
+
+1139
+00:17:50,400 --> 00:17:51,510
+down to one and only one choice.
+By the end of the simulation, the
+
+1140
+00:17:51,510 --> 00:17:51,520
+By the end of the simulation, the
+ 
+
+1141
+00:17:51,520 --> 00:17:53,310
+By the end of the simulation, the
+average score works out to be about
+
+1142
+00:17:53,310 --> 00:17:53,320
+average score works out to be about
+ 
+
+1143
+00:17:53,320 --> 00:17:54,910
+average score works out to be about
+4.124,
+
+1144
+00:17:54,910 --> 00:17:54,920
+4.124,
+ 
+
+1145
+00:17:54,920 --> 00:17:57,550
+4.124,
+which you know, it's not bad to be
+
+1146
+00:17:57,550 --> 00:17:57,560
+which you know, it's not bad to be
+ 
+
+1147
+00:17:57,560 --> 00:17:59,550
+which you know, it's not bad to be
+honest. I kind of expected to do worse,
+
+1148
+00:17:59,550 --> 00:17:59,560
+honest. I kind of expected to do worse,
+ 
+
+1149
+00:17:59,560 --> 00:18:01,110
+honest. I kind of expected to do worse,
+but the people who play Wordle will tell
+
+1150
+00:18:01,110 --> 00:18:01,120
+but the people who play Wordle will tell
+ 
+
+1151
+00:18:01,120 --> 00:18:02,230
+but the people who play Wordle will tell
+you that they can usually get it in
+
+1152
+00:18:02,230 --> 00:18:02,240
+you that they can usually get it in
+ 
+
+1153
+00:18:02,240 --> 00:18:03,990
+you that they can usually get it in
+four. The real challenge is to get as
+
+1154
+00:18:03,990 --> 00:18:04,000
+four. The real challenge is to get as
+ 
+
+1155
+00:18:04,000 --> 00:18:05,710
+four. The real challenge is to get as
+many in three as you can. It's a pretty
+
+1156
+00:18:05,710 --> 00:18:05,720
+many in three as you can. It's a pretty
+ 
+
+1157
+00:18:05,720 --> 00:18:07,270
+many in three as you can. It's a pretty
+big jump between the score of four and
+
+1158
+00:18:07,270 --> 00:18:07,280
+big jump between the score of four and
+ 
+
+1159
+00:18:07,280 --> 00:18:08,790
+big jump between the score of four and
+the score of three.
+
+1160
+00:18:08,790 --> 00:18:08,800
+the score of three.
+ 
+
+1161
+00:18:08,800 --> 00:18:10,310
+the score of three.
+The obvious low-hanging fruit here is to
+
+1162
+00:18:10,310 --> 00:18:10,320
+The obvious low-hanging fruit here is to
+ 
+
+1163
+00:18:10,320 --> 00:18:11,950
+The obvious low-hanging fruit here is to
+somehow incorporate whether or not a
+
+1164
+00:18:11,950 --> 00:18:11,960
+somehow incorporate whether or not a
+ 
+
+1165
+00:18:11,960 --> 00:18:14,270
+somehow incorporate whether or not a
+word is common and how exactly do we do
+
+1166
+00:18:14,270 --> 00:18:14,280
+word is common and how exactly do we do
+ 
+
+1167
+00:18:14,280 --> 00:18:23,070
+word is common and how exactly do we do
+that?
+
+1168
+00:18:23,070 --> 00:18:23,080
+
+ 
+
+1169
+00:18:23,080 --> 00:18:24,750
+
+The way I approached it is to get a list
+
+1170
+00:18:24,750 --> 00:18:24,760
+The way I approached it is to get a list
+ 
+
+1171
+00:18:24,760 --> 00:18:26,430
+The way I approached it is to get a list
+of the relative frequencies for all of
+
+1172
+00:18:26,430 --> 00:18:26,440
+of the relative frequencies for all of
+ 
+
+1173
+00:18:26,440 --> 00:18:28,590
+of the relative frequencies for all of
+the words in the English language. And I
+
+1174
+00:18:28,590 --> 00:18:28,600
+the words in the English language. And I
+ 
+
+1175
+00:18:28,600 --> 00:18:30,430
+the words in the English language. And I
+just used Mathematica's word frequency
+
+1176
+00:18:30,430 --> 00:18:30,440
+just used Mathematica's word frequency
+ 
+
+1177
+00:18:30,440 --> 00:18:32,430
+just used Mathematica's word frequency
+data function, which itself pulls from
+
+1178
+00:18:32,430 --> 00:18:32,440
+data function, which itself pulls from
+ 
+
+1179
+00:18:32,440 --> 00:18:34,310
+data function, which itself pulls from
+the Google Books English Ngram public
+
+1180
+00:18:34,310 --> 00:18:34,320
+the Google Books English Ngram public
+ 
+
+1181
+00:18:34,320 --> 00:18:36,230
+the Google Books English Ngram public
+data set. And it's kind of fun to look
+
+1182
+00:18:36,230 --> 00:18:36,240
+data set. And it's kind of fun to look
+ 
+
+1183
+00:18:36,240 --> 00:18:37,710
+data set. And it's kind of fun to look
+at. For example, if we sort it from the
+
+1184
+00:18:37,710 --> 00:18:37,720
+at. For example, if we sort it from the
+ 
+
+1185
+00:18:37,720 --> 00:18:39,190
+at. For example, if we sort it from the
+most common words to the least common
+
+1186
+00:18:39,190 --> 00:18:39,200
+most common words to the least common
+ 
+
+1187
+00:18:39,200 --> 00:18:41,030
+most common words to the least common
+words, evidently these are the most
+
+1188
+00:18:41,030 --> 00:18:41,040
+words, evidently these are the most
+ 
+
+1189
+00:18:41,040 --> 00:18:42,550
+words, evidently these are the most
+common five-letter words in the English
+
+1190
+00:18:42,550 --> 00:18:42,560
+common five-letter words in the English
+ 
+
+1191
+00:18:42,560 --> 00:18:45,150
+common five-letter words in the English
+language. Or rather, these is the eighth
+
+1192
+00:18:45,150 --> 00:18:45,160
+language. Or rather, these is the eighth
+ 
+
+1193
+00:18:45,160 --> 00:18:47,670
+language. Or rather, these is the eighth
+most common. First is which, after which
+
+1194
+00:18:47,670 --> 00:18:47,680
+most common. First is which, after which
+ 
+
+1195
+00:18:47,680 --> 00:18:49,990
+most common. First is which, after which
+there's there and there. First itself is
+
+1196
+00:18:49,990 --> 00:18:50,000
+there's there and there. First itself is
+ 
+
+1197
+00:18:50,000 --> 00:18:51,950
+there's there and there. First itself is
+not first, but ninth and it makes sense
+
+1198
+00:18:51,950 --> 00:18:51,960
+not first, but ninth and it makes sense
+ 
+
+1199
+00:18:51,960 --> 00:18:53,270
+not first, but ninth and it makes sense
+that these other words could come about
+
+1200
+00:18:53,270 --> 00:18:53,280
+that these other words could come about
+ 
+
+1201
+00:18:53,280 --> 00:18:55,630
+that these other words could come about
+more often. Where those after first are
+
+1202
+00:18:55,630 --> 00:18:55,640
+more often. Where those after first are
+ 
+
+1203
+00:18:55,640 --> 00:18:57,590
+more often. Where those after first are
+after, where and those being just a
+
+1204
+00:18:57,590 --> 00:18:57,600
+after, where and those being just a
+ 
+
+1205
+00:18:57,600 --> 00:18:59,150
+after, where and those being just a
+little bit less common.
+
+1206
+00:18:59,150 --> 00:18:59,160
+little bit less common.
+ 
+
+1207
+00:18:59,160 --> 00:19:01,390
+little bit less common.
+Now, in using this data to model how
+
+1208
+00:19:01,390 --> 00:19:01,400
+Now, in using this data to model how
+ 
+
+1209
+00:19:01,400 --> 00:19:03,310
+Now, in using this data to model how
+likely each of these words is to be the
+
+1210
+00:19:03,310 --> 00:19:03,320
+likely each of these words is to be the
+ 
+
+1211
+00:19:03,320 --> 00:19:04,830
+likely each of these words is to be the
+final answer, it shouldn't just be
+
+1212
+00:19:04,830 --> 00:19:04,840
+final answer, it shouldn't just be
+ 
+
+1213
+00:19:04,840 --> 00:19:06,950
+final answer, it shouldn't just be
+proportional to the frequency cuz, for
+
+1214
+00:19:06,950 --> 00:19:06,960
+proportional to the frequency cuz, for
+ 
+
+1215
+00:19:06,960 --> 00:19:10,350
+proportional to the frequency cuz, for
+example, which is given a score of 0.002
+
+1216
+00:19:10,350 --> 00:19:10,360
+example, which is given a score of 0.002
+ 
+
+1217
+00:19:10,360 --> 00:19:12,430
+example, which is given a score of 0.002
+in this data set, whereas the word braid
+
+1218
+00:19:12,430 --> 00:19:12,440
+in this data set, whereas the word braid
+ 
+
+1219
+00:19:12,440 --> 00:19:14,350
+in this data set, whereas the word braid
+is in some sense about a thousand times
+
+1220
+00:19:14,350 --> 00:19:14,360
+is in some sense about a thousand times
+ 
+
+1221
+00:19:14,360 --> 00:19:16,190
+is in some sense about a thousand times
+less likely. But both of these are
+
+1222
+00:19:16,190 --> 00:19:16,200
+less likely. But both of these are
+ 
+
+1223
+00:19:16,200 --> 00:19:17,670
+less likely. But both of these are
+common enough words that they're almost
+
+1224
+00:19:17,670 --> 00:19:17,680
+common enough words that they're almost
+ 
+
+1225
+00:19:17,680 --> 00:19:19,630
+common enough words that they're almost
+certainly worth considering. So we want
+
+1226
+00:19:19,630 --> 00:19:19,640
+certainly worth considering. So we want
+ 
+
+1227
+00:19:19,640 --> 00:19:21,790
+certainly worth considering. So we want
+more of a binary cut-off.
+
+1228
+00:19:21,790 --> 00:19:21,800
+more of a binary cut-off.
+ 
+
+1229
+00:19:21,800 --> 00:19:23,310
+more of a binary cut-off.
+The way I went about it is to imagine
+
+1230
+00:19:23,310 --> 00:19:23,320
+The way I went about it is to imagine
+ 
+
+1231
+00:19:23,320 --> 00:19:26,150
+The way I went about it is to imagine
+taking this whole sorted list of words
+
+1232
+00:19:26,150 --> 00:19:26,160
+taking this whole sorted list of words
+ 
+
+1233
+00:19:26,160 --> 00:19:28,430
+taking this whole sorted list of words
+and then arranging it on an x-axis and
+
+1234
+00:19:28,430 --> 00:19:28,440
+and then arranging it on an x-axis and
+ 
+
+1235
+00:19:28,440 --> 00:19:30,230
+and then arranging it on an x-axis and
+then applying the sigmoid function,
+
+1236
+00:19:30,230 --> 00:19:30,240
+then applying the sigmoid function,
+ 
+
+1237
+00:19:30,240 --> 00:19:31,430
+then applying the sigmoid function,
+which is the standard way to have a
+
+1238
+00:19:31,430 --> 00:19:31,440
+which is the standard way to have a
+ 
+
+1239
+00:19:31,440 --> 00:19:33,070
+which is the standard way to have a
+function whose output is basically
+
+1240
+00:19:33,070 --> 00:19:33,080
+function whose output is basically
+ 
+
+1241
+00:19:33,080 --> 00:19:35,190
+function whose output is basically
+binary. It's either zero or it's one,
+
+1242
+00:19:35,190 --> 00:19:35,200
+binary. It's either zero or it's one,
+ 
+
+1243
+00:19:35,200 --> 00:19:37,030
+binary. It's either zero or it's one,
+but there's a smoothing in between for
+
+1244
+00:19:37,030 --> 00:19:37,040
+but there's a smoothing in between for
+ 
+
+1245
+00:19:37,040 --> 00:19:39,070
+but there's a smoothing in between for
+that region of uncertainty.
+
+1246
+00:19:39,070 --> 00:19:39,080
+that region of uncertainty.
+ 
+
+1247
+00:19:39,080 --> 00:19:40,670
+that region of uncertainty.
+So essentially the probability that I'm
+
+1248
+00:19:40,670 --> 00:19:40,680
+So essentially the probability that I'm
+ 
+
+1249
+00:19:40,680 --> 00:19:42,630
+So essentially the probability that I'm
+assigning to each word for being in the
+
+1250
+00:19:42,630 --> 00:19:42,640
+assigning to each word for being in the
+ 
+
+1251
+00:19:42,640 --> 00:19:44,910
+assigning to each word for being in the
+final list will be the value of the
+
+1252
+00:19:44,910 --> 00:19:44,920
+final list will be the value of the
+ 
+
+1253
+00:19:44,920 --> 00:19:47,430
+final list will be the value of the
+sigmoid function above wherever it sits
+
+1254
+00:19:47,430 --> 00:19:47,440
+sigmoid function above wherever it sits
+ 
+
+1255
+00:19:47,440 --> 00:19:49,390
+sigmoid function above wherever it sits
+on the x-axis.
+
+1256
+00:19:49,390 --> 00:19:49,400
+on the x-axis.
+ 
+
+1257
+00:19:49,400 --> 00:19:50,950
+on the x-axis.
+Now, obviously this depends on a few
+
+1258
+00:19:50,950 --> 00:19:50,960
+Now, obviously this depends on a few
+ 
+
+1259
+00:19:50,960 --> 00:19:52,750
+Now, obviously this depends on a few
+parameters. For example, how wide a
+
+1260
+00:19:52,750 --> 00:19:52,760
+parameters. For example, how wide a
+ 
+
+1261
+00:19:52,760 --> 00:19:55,350
+parameters. For example, how wide a
+space on the x-axis those words fill
+
+1262
+00:19:55,350 --> 00:19:55,360
+space on the x-axis those words fill
+ 
+
+1263
+00:19:55,360 --> 00:19:57,150
+space on the x-axis those words fill
+determines how gradually or steeply we
+
+1264
+00:19:57,150 --> 00:19:57,160
+determines how gradually or steeply we
+ 
+
+1265
+00:19:57,160 --> 00:19:59,430
+determines how gradually or steeply we
+drop off from one to zero.
+
+1266
+00:19:59,430 --> 00:19:59,440
+drop off from one to zero.
+ 
+
+1267
+00:19:59,440 --> 00:20:01,070
+drop off from one to zero.
+And where we situate them left to right
+
+1268
+00:20:01,070 --> 00:20:01,080
+And where we situate them left to right
+ 
+
+1269
+00:20:01,080 --> 00:20:03,230
+And where we situate them left to right
+determines the cut-off. And to be
+
+1270
+00:20:03,230 --> 00:20:03,240
+determines the cut-off. And to be
+ 
+
+1271
+00:20:03,240 --> 00:20:04,710
+determines the cut-off. And to be
+honest, the way I did this was kind of
+
+1272
+00:20:04,710 --> 00:20:04,720
+honest, the way I did this was kind of
+ 
+
+1273
+00:20:04,720 --> 00:20:06,230
+honest, the way I did this was kind of
+just licking my finger and sticking it
+
+1274
+00:20:06,230 --> 00:20:06,240
+just licking my finger and sticking it
+ 
+
+1275
+00:20:06,240 --> 00:20:07,910
+just licking my finger and sticking it
+into the wind. I looked through the
+
+1276
+00:20:07,910 --> 00:20:07,920
+into the wind. I looked through the
+ 
+
+1277
+00:20:07,920 --> 00:20:09,710
+into the wind. I looked through the
+sorted list and tried to find a window
+
+1278
+00:20:09,710 --> 00:20:09,720
+sorted list and tried to find a window
+ 
+
+1279
+00:20:09,720 --> 00:20:11,470
+sorted list and tried to find a window
+where when I looked at it I figured,
+
+1280
+00:20:11,470 --> 00:20:11,480
+where when I looked at it I figured,
+ 
+
+1281
+00:20:11,480 --> 00:20:12,830
+where when I looked at it I figured,
+"Yeah, about half of these words are
+
+1282
+00:20:12,830 --> 00:20:12,840
+"Yeah, about half of these words are
+ 
+
+1283
+00:20:12,840 --> 00:20:14,270
+"Yeah, about half of these words are
+more likely than not to be the final
+
+1284
+00:20:14,270 --> 00:20:14,280
+more likely than not to be the final
+ 
+
+1285
+00:20:14,280 --> 00:20:16,990
+more likely than not to be the final
+answer." and used that as the cut-off.
+
+1286
+00:20:16,990 --> 00:20:17,000
+answer." and used that as the cut-off.
+ 
+
+1287
+00:20:17,000 --> 00:20:18,910
+answer." and used that as the cut-off.
+Now, once we have a distribution like
+
+1288
+00:20:18,910 --> 00:20:18,920
+Now, once we have a distribution like
+ 
+
+1289
+00:20:18,920 --> 00:20:20,750
+Now, once we have a distribution like
+this across the words, it gives us
+
+1290
+00:20:20,750 --> 00:20:20,760
+this across the words, it gives us
+ 
+
+1291
+00:20:20,760 --> 00:20:22,550
+this across the words, it gives us
+another situation where entropy becomes
+
+1292
+00:20:22,550 --> 00:20:22,560
+another situation where entropy becomes
+ 
+
+1293
+00:20:22,560 --> 00:20:24,390
+another situation where entropy becomes
+this really useful measurement. For
+
+1294
+00:20:24,390 --> 00:20:24,400
+this really useful measurement. For
+ 
+
+1295
+00:20:24,400 --> 00:20:25,790
+this really useful measurement. For
+example, let's say we were playing a
+
+1296
+00:20:25,790 --> 00:20:25,800
+example, let's say we were playing a
+ 
+
+1297
+00:20:25,800 --> 00:20:27,830
+example, let's say we were playing a
+game and we start with my old openers,
+
+1298
+00:20:27,830 --> 00:20:27,840
+game and we start with my old openers,
+ 
+
+1299
+00:20:27,840 --> 00:20:29,870
+game and we start with my old openers,
+which were other and nails, and we end
+
+1300
+00:20:29,870 --> 00:20:29,880
+which were other and nails, and we end
+ 
+
+1301
+00:20:29,880 --> 00:20:31,630
+which were other and nails, and we end
+up with a situation where there's four
+
+1302
+00:20:31,630 --> 00:20:31,640
+up with a situation where there's four
+ 
+
+1303
+00:20:31,640 --> 00:20:33,830
+up with a situation where there's four
+possible words that match it. And let's
+
+1304
+00:20:33,830 --> 00:20:33,840
+possible words that match it. And let's
+ 
+
+1305
+00:20:33,840 --> 00:20:36,310
+possible words that match it. And let's
+say we consider them all equally likely.
+
+1306
+00:20:36,310 --> 00:20:36,320
+say we consider them all equally likely.
+ 
+
+1307
+00:20:36,320 --> 00:20:38,030
+say we consider them all equally likely.
+Let me ask you, what is the entropy of
+
+1308
+00:20:38,030 --> 00:20:38,040
+Let me ask you, what is the entropy of
+ 
+
+1309
+00:20:38,040 --> 00:20:40,990
+Let me ask you, what is the entropy of
+this distribution?
+
+1310
+00:20:40,990 --> 00:20:41,000
+this distribution?
+ 
+
+1311
+00:20:41,000 --> 00:20:43,310
+this distribution?
+Well, the information associated with
+
+1312
+00:20:43,310 --> 00:20:43,320
+Well, the information associated with
+ 
+
+1313
+00:20:43,320 --> 00:20:45,710
+Well, the information associated with
+each one of these possibilities is going
+
+1314
+00:20:45,710 --> 00:20:45,720
+each one of these possibilities is going
+ 
+
+1315
+00:20:45,720 --> 00:20:48,030
+each one of these possibilities is going
+to be the log base two of four, since
+
+1316
+00:20:48,030 --> 00:20:48,040
+to be the log base two of four, since
+ 
+
+1317
+00:20:48,040 --> 00:20:50,310
+to be the log base two of four, since
+each one is one in four, and that's two.
+
+1318
+00:20:50,310 --> 00:20:50,320
+each one is one in four, and that's two.
+ 
+
+1319
+00:20:50,320 --> 00:20:51,790
+each one is one in four, and that's two.
+It's two bits of information, four
+
+1320
+00:20:51,790 --> 00:20:51,800
+It's two bits of information, four
+ 
+
+1321
+00:20:51,800 --> 00:20:54,150
+It's two bits of information, four
+possibilities. All very well and good.
+
+1322
+00:20:54,150 --> 00:20:54,160
+possibilities. All very well and good.
+ 
+
+1323
+00:20:54,160 --> 00:20:56,390
+possibilities. All very well and good.
+But what if I told you that actually
+
+1324
+00:20:56,390 --> 00:20:56,400
+But what if I told you that actually
+ 
+
+1325
+00:20:56,400 --> 00:20:58,230
+But what if I told you that actually
+there's more than four matches? In
+
+1326
+00:20:58,230 --> 00:20:58,240
+there's more than four matches? In
+ 
+
+1327
+00:20:58,240 --> 00:20:59,710
+there's more than four matches? In
+reality, when we look through the full
+
+1328
+00:20:59,710 --> 00:20:59,720
+reality, when we look through the full
+ 
+
+1329
+00:20:59,720 --> 00:21:02,030
+reality, when we look through the full
+word list, there are 16 words that match
+
+1330
+00:21:02,030 --> 00:21:02,040
+word list, there are 16 words that match
+ 
+
+1331
+00:21:02,040 --> 00:21:04,070
+word list, there are 16 words that match
+it. But suppose our model puts a really
+
+1332
+00:21:04,070 --> 00:21:04,080
+it. But suppose our model puts a really
+ 
+
+1333
+00:21:04,080 --> 00:21:06,430
+it. But suppose our model puts a really
+low probability on those other 12 words
+
+1334
+00:21:06,430 --> 00:21:06,440
+low probability on those other 12 words
+ 
+
+1335
+00:21:06,440 --> 00:21:08,430
+low probability on those other 12 words
+of actually being the final answer.
+
+1336
+00:21:08,430 --> 00:21:08,440
+of actually being the final answer.
+ 
+
+1337
+00:21:08,440 --> 00:21:09,870
+of actually being the final answer.
+Something like one in a thousand cuz
+
+1338
+00:21:09,870 --> 00:21:09,880
+Something like one in a thousand cuz
+ 
+
+1339
+00:21:09,880 --> 00:21:11,430
+Something like one in a thousand cuz
+they're really obscure.
+
+1340
+00:21:11,430 --> 00:21:11,440
+they're really obscure.
+ 
+
+1341
+00:21:11,440 --> 00:21:13,270
+they're really obscure.
+Now, let me ask you, what is the entropy
+
+1342
+00:21:13,270 --> 00:21:13,280
+Now, let me ask you, what is the entropy
+ 
+
+1343
+00:21:13,280 --> 00:21:15,350
+Now, let me ask you, what is the entropy
+of this distribution?
+
+1344
+00:21:15,350 --> 00:21:15,360
+of this distribution?
+ 
+
+1345
+00:21:15,360 --> 00:21:17,110
+of this distribution?
+If entropy was purely measuring the
+
+1346
+00:21:17,110 --> 00:21:17,120
+If entropy was purely measuring the
+ 
+
+1347
+00:21:17,120 --> 00:21:19,110
+If entropy was purely measuring the
+number of matches here, then you might
+
+1348
+00:21:19,110 --> 00:21:19,120
+number of matches here, then you might
+ 
+
+1349
+00:21:19,120 --> 00:21:20,750
+number of matches here, then you might
+expect it to be something like the log
+
+1350
+00:21:20,750 --> 00:21:20,760
+expect it to be something like the log
+ 
+
+1351
+00:21:20,760 --> 00:21:23,630
+expect it to be something like the log
+base two of 16, which would be four, two
+
+1352
+00:21:23,630 --> 00:21:23,640
+base two of 16, which would be four, two
+ 
+
+1353
+00:21:23,640 --> 00:21:25,190
+base two of 16, which would be four, two
+more bits of uncertainty than we had
+
+1354
+00:21:25,190 --> 00:21:25,200
+more bits of uncertainty than we had
+ 
+
+1355
+00:21:25,200 --> 00:21:27,030
+more bits of uncertainty than we had
+before. But of course, the actual
+
+1356
+00:21:27,030 --> 00:21:27,040
+before. But of course, the actual
+ 
+
+1357
+00:21:27,040 --> 00:21:28,830
+before. But of course, the actual
+uncertainty is not really that different
+
+1358
+00:21:28,830 --> 00:21:28,840
+uncertainty is not really that different
+ 
+
+1359
+00:21:28,840 --> 00:21:30,510
+uncertainty is not really that different
+from what we had before cuz just because
+
+1360
+00:21:30,510 --> 00:21:30,520
+from what we had before cuz just because
+ 
+
+1361
+00:21:30,520 --> 00:21:32,470
+from what we had before cuz just because
+there's these 12 really obscure words,
+
+1362
+00:21:32,470 --> 00:21:32,480
+there's these 12 really obscure words,
+ 
+
+1363
+00:21:32,480 --> 00:21:33,830
+there's these 12 really obscure words,
+doesn't mean that it would be all that
+
+1364
+00:21:33,830 --> 00:21:33,840
+doesn't mean that it would be all that
+ 
+
+1365
+00:21:33,840 --> 00:21:35,470
+doesn't mean that it would be all that
+more surprising to learn that the final
+
+1366
+00:21:35,470 --> 00:21:35,480
+more surprising to learn that the final
+ 
+
+1367
+00:21:35,480 --> 00:21:38,070
+more surprising to learn that the final
+answer is charm, for example.
+
+1368
+00:21:38,070 --> 00:21:38,080
+answer is charm, for example.
+ 
+
+1369
+00:21:38,080 --> 00:21:39,470
+answer is charm, for example.
+So, when you actually do the calculation
+
+1370
+00:21:39,470 --> 00:21:39,480
+So, when you actually do the calculation
+ 
+
+1371
+00:21:39,480 --> 00:21:41,230
+So, when you actually do the calculation
+here and you add up the probability of
+
+1372
+00:21:41,230 --> 00:21:41,240
+here and you add up the probability of
+ 
+
+1373
+00:21:41,240 --> 00:21:42,870
+here and you add up the probability of
+each occurrence times the corresponding
+
+1374
+00:21:42,870 --> 00:21:42,880
+each occurrence times the corresponding
+ 
+
+1375
+00:21:42,880 --> 00:21:46,430
+each occurrence times the corresponding
+information, what you get is 2.11 bits.
+
+1376
+00:21:46,430 --> 00:21:46,440
+information, what you get is 2.11 bits.
+ 
+
+1377
+00:21:46,440 --> 00:21:47,790
+information, what you get is 2.11 bits.
+Which is saying, it's basically two
+
+1378
+00:21:47,790 --> 00:21:47,800
+Which is saying, it's basically two
+ 
+
+1379
+00:21:47,800 --> 00:21:49,030
+Which is saying, it's basically two
+bits. It's basically those four
+
+1380
+00:21:49,030 --> 00:21:49,040
+bits. It's basically those four
+ 
+
+1381
+00:21:49,040 --> 00:21:50,750
+bits. It's basically those four
+possibilities, but there's a little more
+
+1382
+00:21:50,750 --> 00:21:50,760
+possibilities, but there's a little more
+ 
+
+1383
+00:21:50,760 --> 00:21:52,430
+possibilities, but there's a little more
+uncertainty because of all of those
+
+1384
+00:21:52,430 --> 00:21:52,440
+uncertainty because of all of those
+ 
+
+1385
+00:21:52,440 --> 00:21:54,110
+uncertainty because of all of those
+highly unlikely events. Though, if you
+
+1386
+00:21:54,110 --> 00:21:54,120
+highly unlikely events. Though, if you
+ 
+
+1387
+00:21:54,120 --> 00:21:55,310
+highly unlikely events. Though, if you
+did learn them, you'd get a ton of
+
+1388
+00:21:55,310 --> 00:21:55,320
+did learn them, you'd get a ton of
+ 
+
+1389
+00:21:55,320 --> 00:21:56,990
+did learn them, you'd get a ton of
+information from it.
+
+1390
+00:21:56,990 --> 00:21:57,000
+information from it.
+ 
+
+1391
+00:21:57,000 --> 00:21:58,430
+information from it.
+So, zooming out, this is part of what
+
+1392
+00:21:58,430 --> 00:21:58,440
+So, zooming out, this is part of what
+ 
+
+1393
+00:21:58,440 --> 00:22:00,230
+So, zooming out, this is part of what
+makes Wordle such a nice example for an
+
+1394
+00:22:00,230 --> 00:22:00,240
+makes Wordle such a nice example for an
+ 
+
+1395
+00:22:00,240 --> 00:22:02,030
+makes Wordle such a nice example for an
+information theory lesson. We have these
+
+1396
+00:22:02,030 --> 00:22:02,040
+information theory lesson. We have these
+ 
+
+1397
+00:22:02,040 --> 00:22:04,150
+information theory lesson. We have these
+two distinct-feeling applications for
+
+1398
+00:22:04,150 --> 00:22:04,160
+two distinct-feeling applications for
+ 
+
+1399
+00:22:04,160 --> 00:22:06,550
+two distinct-feeling applications for
+entropy. The first one telling us what's
+
+1400
+00:22:06,550 --> 00:22:06,560
+entropy. The first one telling us what's
+ 
+
+1401
+00:22:06,560 --> 00:22:08,190
+entropy. The first one telling us what's
+the expected information we'll get from
+
+1402
+00:22:08,190 --> 00:22:08,200
+the expected information we'll get from
+ 
+
+1403
+00:22:08,200 --> 00:22:10,350
+the expected information we'll get from
+a given guess. And the second one
+
+1404
+00:22:10,350 --> 00:22:10,360
+a given guess. And the second one
+ 
+
+1405
+00:22:10,360 --> 00:22:12,310
+a given guess. And the second one
+saying, can we measure the remaining
+
+1406
+00:22:12,310 --> 00:22:12,320
+saying, can we measure the remaining
+ 
+
+1407
+00:22:12,320 --> 00:22:14,590
+saying, can we measure the remaining
+uncertainty among all of the words that
+
+1408
+00:22:14,590 --> 00:22:14,600
+uncertainty among all of the words that
+ 
+
+1409
+00:22:14,600 --> 00:22:16,270
+uncertainty among all of the words that
+we have possible?
+
+1410
+00:22:16,270 --> 00:22:16,280
+we have possible?
+ 
+
+1411
+00:22:16,280 --> 00:22:17,710
+we have possible?
+And I should emphasize in that first
+
+1412
+00:22:17,710 --> 00:22:17,720
+And I should emphasize in that first
+ 
+
+1413
+00:22:17,720 --> 00:22:19,230
+And I should emphasize in that first
+case where we're looking at the expected
+
+1414
+00:22:19,230 --> 00:22:19,240
+case where we're looking at the expected
+ 
+
+1415
+00:22:19,240 --> 00:22:21,150
+case where we're looking at the expected
+information of a guess, once we have an
+
+1416
+00:22:21,150 --> 00:22:21,160
+information of a guess, once we have an
+ 
+
+1417
+00:22:21,160 --> 00:22:22,990
+information of a guess, once we have an
+unequal weighting to the words, that
+
+1418
+00:22:22,990 --> 00:22:23,000
+unequal weighting to the words, that
+ 
+
+1419
+00:22:23,000 --> 00:22:24,950
+unequal weighting to the words, that
+affects the entropy calculation. For
+
+1420
+00:22:24,950 --> 00:22:24,960
+affects the entropy calculation. For
+ 
+
+1421
+00:22:24,960 --> 00:22:26,510
+affects the entropy calculation. For
+example, let me pull up that same case
+
+1422
+00:22:26,510 --> 00:22:26,520
+example, let me pull up that same case
+ 
+
+1423
+00:22:26,520 --> 00:22:27,910
+example, let me pull up that same case
+we were looking at earlier of the
+
+1424
+00:22:27,910 --> 00:22:27,920
+we were looking at earlier of the
+ 
+
+1425
+00:22:27,920 --> 00:22:30,150
+we were looking at earlier of the
+distribution associated with weary, but
+
+1426
+00:22:30,150 --> 00:22:30,160
+distribution associated with weary, but
+ 
+
+1427
+00:22:30,160 --> 00:22:31,750
+distribution associated with weary, but
+this time using a non-uniform
+
+1428
+00:22:31,750 --> 00:22:31,760
+this time using a non-uniform
+ 
+
+1429
+00:22:31,760 --> 00:22:34,350
+this time using a non-uniform
+distribution across all possible words.
+
+1430
+00:22:34,350 --> 00:22:34,360
+distribution across all possible words.
+ 
+
+1431
+00:22:34,360 --> 00:22:36,310
+distribution across all possible words.
+So, let me see if I can find a part here
+
+1432
+00:22:36,310 --> 00:22:36,320
+So, let me see if I can find a part here
+ 
+
+1433
+00:22:36,320 --> 00:22:40,310
+So, let me see if I can find a part here
+that illustrates it pretty well.
+
+1434
+00:22:40,310 --> 00:22:40,320
+
+ 
+
+1435
+00:22:40,320 --> 00:22:42,710
+
+Uh okay, here this is pretty good. Here
+
+1436
+00:22:42,710 --> 00:22:42,720
+Uh okay, here this is pretty good. Here
+ 
+
+1437
+00:22:42,720 --> 00:22:44,150
+Uh okay, here this is pretty good. Here
+we have two adjacent patterns that are
+
+1438
+00:22:44,150 --> 00:22:44,160
+we have two adjacent patterns that are
+ 
+
+1439
+00:22:44,160 --> 00:22:46,190
+we have two adjacent patterns that are
+about equally likely, but one of them
+
+1440
+00:22:46,190 --> 00:22:46,200
+about equally likely, but one of them
+ 
+
+1441
+00:22:46,200 --> 00:22:48,350
+about equally likely, but one of them
+we're told has 32 possible words that
+
+1442
+00:22:48,350 --> 00:22:48,360
+we're told has 32 possible words that
+ 
+
+1443
+00:22:48,360 --> 00:22:50,430
+we're told has 32 possible words that
+match it. And if we check what they are,
+
+1444
+00:22:50,430 --> 00:22:50,440
+match it. And if we check what they are,
+ 
+
+1445
+00:22:50,440 --> 00:22:52,750
+match it. And if we check what they are,
+these are those 32, which are all just
+
+1446
+00:22:52,750 --> 00:22:52,760
+these are those 32, which are all just
+ 
+
+1447
+00:22:52,760 --> 00:22:54,910
+these are those 32, which are all just
+very unlikely words. As you scan your
+
+1448
+00:22:54,910 --> 00:22:54,920
+very unlikely words. As you scan your
+ 
+
+1449
+00:22:54,920 --> 00:22:56,070
+very unlikely words. As you scan your
+eyes over them, you know, it's hard to
+
+1450
+00:22:56,070 --> 00:22:56,080
+eyes over them, you know, it's hard to
+ 
+
+1451
+00:22:56,080 --> 00:22:57,750
+eyes over them, you know, it's hard to
+find any that feel like plausible
+
+1452
+00:22:57,750 --> 00:22:57,760
+find any that feel like plausible
+ 
+
+1453
+00:22:57,760 --> 00:23:00,270
+find any that feel like plausible
+answers. Maybe yells? But if we look at
+
+1454
+00:23:00,270 --> 00:23:00,280
+answers. Maybe yells? But if we look at
+ 
+
+1455
+00:23:00,280 --> 00:23:01,310
+answers. Maybe yells? But if we look at
+the neighboring pattern in the
+
+1456
+00:23:01,310 --> 00:23:01,320
+the neighboring pattern in the
+ 
+
+1457
+00:23:01,320 --> 00:23:03,070
+the neighboring pattern in the
+distribution, which is considered just
+
+1458
+00:23:03,070 --> 00:23:03,080
+distribution, which is considered just
+ 
+
+1459
+00:23:03,080 --> 00:23:05,230
+distribution, which is considered just
+about as likely, we're told that it only
+
+1460
+00:23:05,230 --> 00:23:05,240
+about as likely, we're told that it only
+ 
+
+1461
+00:23:05,240 --> 00:23:07,110
+about as likely, we're told that it only
+has eight possible matches. So, a
+
+1462
+00:23:07,110 --> 00:23:07,120
+has eight possible matches. So, a
+ 
+
+1463
+00:23:07,120 --> 00:23:08,910
+has eight possible matches. So, a
+quarter as many matches, but it's about
+
+1464
+00:23:08,910 --> 00:23:08,920
+quarter as many matches, but it's about
+ 
+
+1465
+00:23:08,920 --> 00:23:10,830
+quarter as many matches, but it's about
+as likely. And when we pull up those
+
+1466
+00:23:10,830 --> 00:23:10,840
+as likely. And when we pull up those
+ 
+
+1467
+00:23:10,840 --> 00:23:12,670
+as likely. And when we pull up those
+matches, we can see why. Some of these
+
+1468
+00:23:12,670 --> 00:23:12,680
+matches, we can see why. Some of these
+ 
+
+1469
+00:23:12,680 --> 00:23:14,910
+matches, we can see why. Some of these
+are actual plausible answers, like ring
+
+1470
+00:23:14,910 --> 00:23:14,920
+are actual plausible answers, like ring
+ 
+
+1471
+00:23:14,920 --> 00:23:17,750
+are actual plausible answers, like ring
+or wrath or wraps.
+
+1472
+00:23:17,750 --> 00:23:17,760
+or wrath or wraps.
+ 
+
+1473
+00:23:17,760 --> 00:23:19,270
+or wrath or wraps.
+To illustrate how we incorporate all
+
+1474
+00:23:19,270 --> 00:23:19,280
+To illustrate how we incorporate all
+ 
+
+1475
+00:23:19,280 --> 00:23:21,230
+To illustrate how we incorporate all
+that, let me pull up version two of the
+
+1476
+00:23:21,230 --> 00:23:21,240
+that, let me pull up version two of the
+ 
+
+1477
+00:23:21,240 --> 00:23:23,230
+that, let me pull up version two of the
+Wordle bot here, and there are two or
+
+1478
+00:23:23,230 --> 00:23:23,240
+Wordle bot here, and there are two or
+ 
+
+1479
+00:23:23,240 --> 00:23:24,590
+Wordle bot here, and there are two or
+three main differences from the first
+
+1480
+00:23:24,590 --> 00:23:24,600
+three main differences from the first
+ 
+
+1481
+00:23:24,600 --> 00:23:26,510
+three main differences from the first
+one that we saw. First off, like I just
+
+1482
+00:23:26,510 --> 00:23:26,520
+one that we saw. First off, like I just
+ 
+
+1483
+00:23:26,520 --> 00:23:28,110
+one that we saw. First off, like I just
+said, the way that we're computing these
+
+1484
+00:23:28,110 --> 00:23:28,120
+said, the way that we're computing these
+ 
+
+1485
+00:23:28,120 --> 00:23:29,910
+said, the way that we're computing these
+entropies, these expected values of
+
+1486
+00:23:29,910 --> 00:23:29,920
+entropies, these expected values of
+ 
+
+1487
+00:23:29,920 --> 00:23:32,070
+entropies, these expected values of
+information, is now using the more
+
+1488
+00:23:32,070 --> 00:23:32,080
+information, is now using the more
+ 
+
+1489
+00:23:32,080 --> 00:23:34,070
+information, is now using the more
+refined distributions across the
+
+1490
+00:23:34,070 --> 00:23:34,080
+refined distributions across the
+ 
+
+1491
+00:23:34,080 --> 00:23:35,590
+refined distributions across the
+patterns that incorporates the
+
+1492
+00:23:35,590 --> 00:23:35,600
+patterns that incorporates the
+ 
+
+1493
+00:23:35,600 --> 00:23:37,110
+patterns that incorporates the
+probability that a given word would
+
+1494
+00:23:37,110 --> 00:23:37,120
+probability that a given word would
+ 
+
+1495
+00:23:37,120 --> 00:23:38,990
+probability that a given word would
+actually be the answer.
+
+1496
+00:23:38,990 --> 00:23:39,000
+actually be the answer.
+ 
+
+1497
+00:23:39,000 --> 00:23:41,270
+actually be the answer.
+Uh as it happens, tears is still number
+
+1498
+00:23:41,270 --> 00:23:41,280
+Uh as it happens, tears is still number
+ 
+
+1499
+00:23:41,280 --> 00:23:43,270
+Uh as it happens, tears is still number
+one, though the ones following are a bit
+
+1500
+00:23:43,270 --> 00:23:43,280
+one, though the ones following are a bit
+ 
+
+1501
+00:23:43,280 --> 00:23:45,430
+one, though the ones following are a bit
+different. Second, when it ranks its top
+
+1502
+00:23:45,430 --> 00:23:45,440
+different. Second, when it ranks its top
+ 
+
+1503
+00:23:45,440 --> 00:23:47,030
+different. Second, when it ranks its top
+picks, it's now going to keep a model of
+
+1504
+00:23:47,030 --> 00:23:47,040
+picks, it's now going to keep a model of
+ 
+
+1505
+00:23:47,040 --> 00:23:48,910
+picks, it's now going to keep a model of
+the probability that each word is the
+
+1506
+00:23:48,910 --> 00:23:48,920
+the probability that each word is the
+ 
+
+1507
+00:23:48,920 --> 00:23:50,910
+the probability that each word is the
+actual answer, and it'll incorporate
+
+1508
+00:23:50,910 --> 00:23:50,920
+actual answer, and it'll incorporate
+ 
+
+1509
+00:23:50,920 --> 00:23:52,950
+actual answer, and it'll incorporate
+that into its decision, which is easier
+
+1510
+00:23:52,950 --> 00:23:52,960
+that into its decision, which is easier
+ 
+
+1511
+00:23:52,960 --> 00:23:54,590
+that into its decision, which is easier
+to see once we have a few guesses on the
+
+1512
+00:23:54,590 --> 00:23:54,600
+to see once we have a few guesses on the
+ 
+
+1513
+00:23:54,600 --> 00:23:55,750
+to see once we have a few guesses on the
+table.
+
+1514
+00:23:55,750 --> 00:23:55,760
+table.
+ 
+
+1515
+00:23:55,760 --> 00:23:57,430
+table.
+Again, ignoring its recommendation
+
+1516
+00:23:57,430 --> 00:23:57,440
+Again, ignoring its recommendation
+ 
+
+1517
+00:23:57,440 --> 00:23:59,230
+Again, ignoring its recommendation
+because we can't let machines rule our
+
+1518
+00:23:59,230 --> 00:23:59,240
+because we can't let machines rule our
+ 
+
+1519
+00:23:59,240 --> 00:24:00,790
+because we can't let machines rule our
+lives,
+
+1520
+00:24:00,790 --> 00:24:00,800
+lives,
+ 
+
+1521
+00:24:00,800 --> 00:24:02,190
+lives,
+and I suppose I should mention another
+
+1522
+00:24:02,190 --> 00:24:02,200
+and I suppose I should mention another
+ 
+
+1523
+00:24:02,200 --> 00:24:03,670
+and I suppose I should mention another
+thing different here is over on the
+
+1524
+00:24:03,670 --> 00:24:03,680
+thing different here is over on the
+ 
+
+1525
+00:24:03,680 --> 00:24:05,630
+thing different here is over on the
+left, that uncertainty value, that
+
+1526
+00:24:05,630 --> 00:24:05,640
+left, that uncertainty value, that
+ 
+
+1527
+00:24:05,640 --> 00:24:07,470
+left, that uncertainty value, that
+number of bits, is no longer just
+
+1528
+00:24:07,470 --> 00:24:07,480
+number of bits, is no longer just
+ 
+
+1529
+00:24:07,480 --> 00:24:09,070
+number of bits, is no longer just
+redundant with the number of possible
+
+1530
+00:24:09,070 --> 00:24:09,080
+redundant with the number of possible
+ 
+
+1531
+00:24:09,080 --> 00:24:10,990
+redundant with the number of possible
+matches. Now, if we pull it up and you
+
+1532
+00:24:10,990 --> 00:24:11,000
+matches. Now, if we pull it up and you
+ 
+
+1533
+00:24:11,000 --> 00:24:13,390
+matches. Now, if we pull it up and you
+know, we calculate, say, 2 to the 8.02,
+
+1534
+00:24:13,390 --> 00:24:13,400
+know, we calculate, say, 2 to the 8.02,
+ 
+
+1535
+00:24:13,400 --> 00:24:15,990
+know, we calculate, say, 2 to the 8.02,
+which should be a little above 256, I
+
+1536
+00:24:15,990 --> 00:24:16,000
+which should be a little above 256, I
+ 
+
+1537
+00:24:16,000 --> 00:24:18,750
+which should be a little above 256, I
+guess uh 259, what it's saying is even
+
+1538
+00:24:18,750 --> 00:24:18,760
+guess uh 259, what it's saying is even
+ 
+
+1539
+00:24:18,760 --> 00:24:21,510
+guess uh 259, what it's saying is even
+though there are 526 total words that
+
+1540
+00:24:21,510 --> 00:24:21,520
+though there are 526 total words that
+ 
+
+1541
+00:24:21,520 --> 00:24:23,430
+though there are 526 total words that
+actually match this pattern, the amount
+
+1542
+00:24:23,430 --> 00:24:23,440
+actually match this pattern, the amount
+ 
+
+1543
+00:24:23,440 --> 00:24:25,550
+actually match this pattern, the amount
+of uncertainty it has is more akin to
+
+1544
+00:24:25,550 --> 00:24:25,560
+of uncertainty it has is more akin to
+ 
+
+1545
+00:24:25,560 --> 00:24:27,670
+of uncertainty it has is more akin to
+what it would be if there were 259
+
+1546
+00:24:27,670 --> 00:24:27,680
+what it would be if there were 259
+ 
+
+1547
+00:24:27,680 --> 00:24:29,630
+what it would be if there were 259
+equally likely outcomes.
+
+1548
+00:24:29,630 --> 00:24:29,640
+equally likely outcomes.
+ 
+
+1549
+00:24:29,640 --> 00:24:31,430
+equally likely outcomes.
+You can think of it like this. It knows
+
+1550
+00:24:31,430 --> 00:24:31,440
+You can think of it like this. It knows
+ 
+
+1551
+00:24:31,440 --> 00:24:33,550
+You can think of it like this. It knows
+borks is not the answer, same with yorts
+
+1552
+00:24:33,550 --> 00:24:33,560
+borks is not the answer, same with yorts
+ 
+
+1553
+00:24:33,560 --> 00:24:35,510
+borks is not the answer, same with yorts
+and zorl and zoris. So, it's a little
+
+1554
+00:24:35,510 --> 00:24:35,520
+and zorl and zoris. So, it's a little
+ 
+
+1555
+00:24:35,520 --> 00:24:36,910
+and zorl and zoris. So, it's a little
+less uncertain than it was in the
+
+1556
+00:24:36,910 --> 00:24:36,920
+less uncertain than it was in the
+ 
+
+1557
+00:24:36,920 --> 00:24:38,550
+less uncertain than it was in the
+previous case. This number of bits will
+
+1558
+00:24:38,550 --> 00:24:38,560
+previous case. This number of bits will
+ 
+
+1559
+00:24:38,560 --> 00:24:39,990
+previous case. This number of bits will
+be smaller.
+
+1560
+00:24:39,990 --> 00:24:40,000
+be smaller.
+ 
+
+1561
+00:24:40,000 --> 00:24:41,310
+be smaller.
+And if I keep playing the game, I'm
+
+1562
+00:24:41,310 --> 00:24:41,320
+And if I keep playing the game, I'm
+ 
+
+1563
+00:24:41,320 --> 00:24:42,910
+And if I keep playing the game, I'm
+refining this down with a couple guesses
+
+1564
+00:24:42,910 --> 00:24:42,920
+refining this down with a couple guesses
+ 
+
+1565
+00:24:42,920 --> 00:24:45,150
+refining this down with a couple guesses
+that are apropos of what I would like to
+
+1566
+00:24:45,150 --> 00:24:45,160
+that are apropos of what I would like to
+ 
+
+1567
+00:24:45,160 --> 00:24:48,550
+that are apropos of what I would like to
+explain here.
+
+1568
+00:24:48,550 --> 00:24:48,560
+
+ 
+
+1569
+00:24:48,560 --> 00:24:50,030
+
+By the fourth guess, if you look over at
+
+1570
+00:24:50,030 --> 00:24:50,040
+By the fourth guess, if you look over at
+ 
+
+1571
+00:24:50,040 --> 00:24:51,830
+By the fourth guess, if you look over at
+its top picks, you can see it's no
+
+1572
+00:24:51,830 --> 00:24:51,840
+its top picks, you can see it's no
+ 
+
+1573
+00:24:51,840 --> 00:24:54,390
+its top picks, you can see it's no
+longer just maximizing the entropy.
+
+1574
+00:24:54,390 --> 00:24:54,400
+longer just maximizing the entropy.
+ 
+
+1575
+00:24:54,400 --> 00:24:55,630
+longer just maximizing the entropy.
+So, at this point, there's technically
+
+1576
+00:24:55,630 --> 00:24:55,640
+So, at this point, there's technically
+ 
+
+1577
+00:24:55,640 --> 00:24:57,870
+So, at this point, there's technically
+seven possibilities, but the only ones
+
+1578
+00:24:57,870 --> 00:24:57,880
+seven possibilities, but the only ones
+ 
+
+1579
+00:24:57,880 --> 00:24:59,790
+seven possibilities, but the only ones
+with a meaningful chance are dorms and
+
+1580
+00:24:59,790 --> 00:24:59,800
+with a meaningful chance are dorms and
+ 
+
+1581
+00:24:59,800 --> 00:25:01,870
+with a meaningful chance are dorms and
+words. And you can see it ranks choosing
+
+1582
+00:25:01,870 --> 00:25:01,880
+words. And you can see it ranks choosing
+ 
+
+1583
+00:25:01,880 --> 00:25:03,950
+words. And you can see it ranks choosing
+both of those above all of these other
+
+1584
+00:25:03,950 --> 00:25:03,960
+both of those above all of these other
+ 
+
+1585
+00:25:03,960 --> 00:25:05,870
+both of those above all of these other
+values that strictly speaking would give
+
+1586
+00:25:05,870 --> 00:25:05,880
+values that strictly speaking would give
+ 
+
+1587
+00:25:05,880 --> 00:25:07,470
+values that strictly speaking would give
+more information.
+
+1588
+00:25:07,470 --> 00:25:07,480
+more information.
+ 
+
+1589
+00:25:07,480 --> 00:25:09,270
+more information.
+The very first time I did this, I just
+
+1590
+00:25:09,270 --> 00:25:09,280
+The very first time I did this, I just
+ 
+
+1591
+00:25:09,280 --> 00:25:10,630
+The very first time I did this, I just
+added up these two numbers to measure
+
+1592
+00:25:10,630 --> 00:25:10,640
+added up these two numbers to measure
+ 
+
+1593
+00:25:10,640 --> 00:25:12,270
+added up these two numbers to measure
+the quality of each guess, which
+
+1594
+00:25:12,270 --> 00:25:12,280
+the quality of each guess, which
+ 
+
+1595
+00:25:12,280 --> 00:25:13,350
+the quality of each guess, which
+actually worked better than you might
+
+1596
+00:25:13,350 --> 00:25:13,360
+actually worked better than you might
+ 
+
+1597
+00:25:13,360 --> 00:25:15,270
+actually worked better than you might
+suspect. But it really didn't feel
+
+1598
+00:25:15,270 --> 00:25:15,280
+suspect. But it really didn't feel
+ 
+
+1599
+00:25:15,280 --> 00:25:16,710
+suspect. But it really didn't feel
+systematic, and I'm sure there's other
+
+1600
+00:25:16,710 --> 00:25:16,720
+systematic, and I'm sure there's other
+ 
+
+1601
+00:25:16,720 --> 00:25:18,270
+systematic, and I'm sure there's other
+approaches people could take, but here's
+
+1602
+00:25:18,270 --> 00:25:18,280
+approaches people could take, but here's
+ 
+
+1603
+00:25:18,280 --> 00:25:19,910
+approaches people could take, but here's
+the one I landed on. If we're
+
+1604
+00:25:19,910 --> 00:25:19,920
+the one I landed on. If we're
+ 
+
+1605
+00:25:19,920 --> 00:25:21,390
+the one I landed on. If we're
+considering the prospect of a next
+
+1606
+00:25:21,390 --> 00:25:21,400
+considering the prospect of a next
+ 
+
+1607
+00:25:21,400 --> 00:25:23,870
+considering the prospect of a next
+guess, like in this case words, what we
+
+1608
+00:25:23,870 --> 00:25:23,880
+guess, like in this case words, what we
+ 
+
+1609
+00:25:23,880 --> 00:25:26,310
+guess, like in this case words, what we
+really care about is the expected score
+
+1610
+00:25:26,310 --> 00:25:26,320
+really care about is the expected score
+ 
+
+1611
+00:25:26,320 --> 00:25:28,430
+really care about is the expected score
+of our game if we do that. And to
+
+1612
+00:25:28,430 --> 00:25:28,440
+of our game if we do that. And to
+ 
+
+1613
+00:25:28,440 --> 00:25:30,510
+of our game if we do that. And to
+calculate that expected score, we say
+
+1614
+00:25:30,510 --> 00:25:30,520
+calculate that expected score, we say
+ 
+
+1615
+00:25:30,520 --> 00:25:32,150
+calculate that expected score, we say
+what's the probability that words is the
+
+1616
+00:25:32,150 --> 00:25:32,160
+what's the probability that words is the
+ 
+
+1617
+00:25:32,160 --> 00:25:34,070
+what's the probability that words is the
+actual answer, which at the moment it
+
+1618
+00:25:34,070 --> 00:25:34,080
+actual answer, which at the moment it
+ 
+
+1619
+00:25:34,080 --> 00:25:37,190
+actual answer, which at the moment it
+describes 58% to. We say with a 58%
+
+1620
+00:25:37,190 --> 00:25:37,200
+describes 58% to. We say with a 58%
+ 
+
+1621
+00:25:37,200 --> 00:25:39,070
+describes 58% to. We say with a 58%
+chance, our score in this game would be
+
+1622
+00:25:39,070 --> 00:25:39,080
+chance, our score in this game would be
+ 
+
+1623
+00:25:39,080 --> 00:25:40,230
+chance, our score in this game would be
+four.
+
+1624
+00:25:40,230 --> 00:25:40,240
+four.
+ 
+
+1625
+00:25:40,240 --> 00:25:41,670
+four.
+And then with the probability of one
+
+1626
+00:25:41,670 --> 00:25:41,680
+And then with the probability of one
+ 
+
+1627
+00:25:41,680 --> 00:25:44,510
+And then with the probability of one
+minus that 58%, um our score will be
+
+1628
+00:25:44,510 --> 00:25:44,520
+minus that 58%, um our score will be
+ 
+
+1629
+00:25:44,520 --> 00:25:46,150
+minus that 58%, um our score will be
+more than that four.
+
+1630
+00:25:46,150 --> 00:25:46,160
+more than that four.
+ 
+
+1631
+00:25:46,160 --> 00:25:47,830
+more than that four.
+How much more we don't know, but we can
+
+1632
+00:25:47,830 --> 00:25:47,840
+How much more we don't know, but we can
+ 
+
+1633
+00:25:47,840 --> 00:25:49,350
+How much more we don't know, but we can
+estimate it based on how much
+
+1634
+00:25:49,350 --> 00:25:49,360
+estimate it based on how much
+ 
+
+1635
+00:25:49,360 --> 00:25:51,590
+estimate it based on how much
+uncertainty there's likely to be once we
+
+1636
+00:25:51,590 --> 00:25:51,600
+uncertainty there's likely to be once we
+ 
+
+1637
+00:25:51,600 --> 00:25:53,590
+uncertainty there's likely to be once we
+get to that point. Specifically, at the
+
+1638
+00:25:53,590 --> 00:25:53,600
+get to that point. Specifically, at the
+ 
+
+1639
+00:25:53,600 --> 00:25:56,390
+get to that point. Specifically, at the
+moment there's 1.44 bits of uncertainty.
+
+1640
+00:25:56,390 --> 00:25:56,400
+moment there's 1.44 bits of uncertainty.
+ 
+
+1641
+00:25:56,400 --> 00:25:57,950
+moment there's 1.44 bits of uncertainty.
+If we guess words, it's telling us the
+
+1642
+00:25:57,950 --> 00:25:57,960
+If we guess words, it's telling us the
+ 
+
+1643
+00:25:57,960 --> 00:26:00,630
+If we guess words, it's telling us the
+expected information we'll get is 1.27
+
+1644
+00:26:00,630 --> 00:26:00,640
+expected information we'll get is 1.27
+ 
+
+1645
+00:26:00,640 --> 00:26:02,990
+expected information we'll get is 1.27
+bits. So if we guess words, this
+
+1646
+00:26:02,990 --> 00:26:03,000
+bits. So if we guess words, this
+ 
+
+1647
+00:26:03,000 --> 00:26:04,430
+bits. So if we guess words, this
+difference represents how much
+
+1648
+00:26:04,430 --> 00:26:04,440
+difference represents how much
+ 
+
+1649
+00:26:04,440 --> 00:26:06,630
+difference represents how much
+uncertainty we're likely to be left with
+
+1650
+00:26:06,630 --> 00:26:06,640
+uncertainty we're likely to be left with
+ 
+
+1651
+00:26:06,640 --> 00:26:08,870
+uncertainty we're likely to be left with
+after that happens. What we need is some
+
+1652
+00:26:08,870 --> 00:26:08,880
+after that happens. What we need is some
+ 
+
+1653
+00:26:08,880 --> 00:26:10,430
+after that happens. What we need is some
+kind of function, which I'm calling F
+
+1654
+00:26:10,430 --> 00:26:10,440
+kind of function, which I'm calling F
+ 
+
+1655
+00:26:10,440 --> 00:26:12,510
+kind of function, which I'm calling F
+here, that associates this uncertainty
+
+1656
+00:26:12,510 --> 00:26:12,520
+here, that associates this uncertainty
+ 
+
+1657
+00:26:12,520 --> 00:26:14,430
+here, that associates this uncertainty
+with an expected score. And the way I
+
+1658
+00:26:14,430 --> 00:26:14,440
+with an expected score. And the way I
+ 
+
+1659
+00:26:14,440 --> 00:26:16,070
+with an expected score. And the way I
+went about this was to just plot a bunch
+
+1660
+00:26:16,070 --> 00:26:16,080
+went about this was to just plot a bunch
+ 
+
+1661
+00:26:16,080 --> 00:26:18,430
+went about this was to just plot a bunch
+of the data from previous games based on
+
+1662
+00:26:18,430 --> 00:26:18,440
+of the data from previous games based on
+ 
+
+1663
+00:26:18,440 --> 00:26:20,670
+of the data from previous games based on
+version one of the bot to say, "Hey,
+
+1664
+00:26:20,670 --> 00:26:20,680
+version one of the bot to say, "Hey,
+ 
+
+1665
+00:26:20,680 --> 00:26:23,550
+version one of the bot to say, "Hey,
+what was the actual score after various
+
+1666
+00:26:23,550 --> 00:26:23,560
+what was the actual score after various
+ 
+
+1667
+00:26:23,560 --> 00:26:25,190
+what was the actual score after various
+points with certain very measurable
+
+1668
+00:26:25,190 --> 00:26:25,200
+points with certain very measurable
+ 
+
+1669
+00:26:25,200 --> 00:26:27,390
+points with certain very measurable
+amounts of uncertainty?" For example,
+
+1670
+00:26:27,390 --> 00:26:27,400
+amounts of uncertainty?" For example,
+ 
+
+1671
+00:26:27,400 --> 00:26:28,990
+amounts of uncertainty?" For example,
+these data points here that are sitting
+
+1672
+00:26:28,990 --> 00:26:29,000
+these data points here that are sitting
+ 
+
+1673
+00:26:29,000 --> 00:26:31,070
+these data points here that are sitting
+above a value that's around like 8.7 or
+
+1674
+00:26:31,070 --> 00:26:31,080
+above a value that's around like 8.7 or
+ 
+
+1675
+00:26:31,080 --> 00:26:33,670
+above a value that's around like 8.7 or
+so are saying for some games after a
+
+1676
+00:26:33,670 --> 00:26:33,680
+so are saying for some games after a
+ 
+
+1677
+00:26:33,680 --> 00:26:35,550
+so are saying for some games after a
+point at which there were 8.7 bits of
+
+1678
+00:26:35,550 --> 00:26:35,560
+point at which there were 8.7 bits of
+ 
+
+1679
+00:26:35,560 --> 00:26:38,110
+point at which there were 8.7 bits of
+uncertainty, it took two guesses to get
+
+1680
+00:26:38,110 --> 00:26:38,120
+uncertainty, it took two guesses to get
+ 
+
+1681
+00:26:38,120 --> 00:26:39,790
+uncertainty, it took two guesses to get
+the final answer. For other games it
+
+1682
+00:26:39,790 --> 00:26:39,800
+the final answer. For other games it
+ 
+
+1683
+00:26:39,800 --> 00:26:41,270
+the final answer. For other games it
+took three guesses. For other games it
+
+1684
+00:26:41,270 --> 00:26:41,280
+took three guesses. For other games it
+ 
+
+1685
+00:26:41,280 --> 00:26:43,030
+took three guesses. For other games it
+took four guesses.
+
+1686
+00:26:43,030 --> 00:26:43,040
+took four guesses.
+ 
+
+1687
+00:26:43,040 --> 00:26:44,830
+took four guesses.
+If we shift over to the left here, all
+
+1688
+00:26:44,830 --> 00:26:44,840
+If we shift over to the left here, all
+ 
+
+1689
+00:26:44,840 --> 00:26:46,670
+If we shift over to the left here, all
+the points over zero are saying whenever
+
+1690
+00:26:46,670 --> 00:26:46,680
+the points over zero are saying whenever
+ 
+
+1691
+00:26:46,680 --> 00:26:48,790
+the points over zero are saying whenever
+there's zero bits of uncertainty, which
+
+1692
+00:26:48,790 --> 00:26:48,800
+there's zero bits of uncertainty, which
+ 
+
+1693
+00:26:48,800 --> 00:26:50,910
+there's zero bits of uncertainty, which
+is to say there's only one possibility,
+
+1694
+00:26:50,910 --> 00:26:50,920
+is to say there's only one possibility,
+ 
+
+1695
+00:26:50,920 --> 00:26:52,630
+is to say there's only one possibility,
+then the number of guesses required is
+
+1696
+00:26:52,630 --> 00:26:52,640
+then the number of guesses required is
+ 
+
+1697
+00:26:52,640 --> 00:26:54,710
+then the number of guesses required is
+always just one, which is reassuring.
+
+1698
+00:26:54,710 --> 00:26:54,720
+always just one, which is reassuring.
+ 
+
+1699
+00:26:54,720 --> 00:26:56,030
+always just one, which is reassuring.
+Whenever there was one bit of
+
+1700
+00:26:56,030 --> 00:26:56,040
+Whenever there was one bit of
+ 
+
+1701
+00:26:56,040 --> 00:26:57,630
+Whenever there was one bit of
+uncertainty, meaning it was essentially
+
+1702
+00:26:57,630 --> 00:26:57,640
+uncertainty, meaning it was essentially
+ 
+
+1703
+00:26:57,640 --> 00:26:59,870
+uncertainty, meaning it was essentially
+just down to two possibilities, then
+
+1704
+00:26:59,870 --> 00:26:59,880
+just down to two possibilities, then
+ 
+
+1705
+00:26:59,880 --> 00:27:01,350
+just down to two possibilities, then
+sometimes it required one more guess,
+
+1706
+00:27:01,350 --> 00:27:01,360
+sometimes it required one more guess,
+ 
+
+1707
+00:27:01,360 --> 00:27:03,590
+sometimes it required one more guess,
+sometimes it required two more guesses,
+
+1708
+00:27:03,590 --> 00:27:03,600
+sometimes it required two more guesses,
+ 
+
+1709
+00:27:03,600 --> 00:27:05,750
+sometimes it required two more guesses,
+and so on and so forth here.
+
+1710
+00:27:05,750 --> 00:27:05,760
+and so on and so forth here.
+ 
+
+1711
+00:27:05,760 --> 00:27:07,470
+and so on and so forth here.
+Maybe a slightly easier way to visualize
+
+1712
+00:27:07,470 --> 00:27:07,480
+Maybe a slightly easier way to visualize
+ 
+
+1713
+00:27:07,480 --> 00:27:09,430
+Maybe a slightly easier way to visualize
+this data is to bucket it together and
+
+1714
+00:27:09,430 --> 00:27:09,440
+this data is to bucket it together and
+ 
+
+1715
+00:27:09,440 --> 00:27:10,910
+this data is to bucket it together and
+take averages.
+
+1716
+00:27:10,910 --> 00:27:10,920
+take averages.
+ 
+
+1717
+00:27:10,920 --> 00:27:12,190
+take averages.
+For example, this bar here is saying
+
+1718
+00:27:12,190 --> 00:27:12,200
+For example, this bar here is saying
+ 
+
+1719
+00:27:12,200 --> 00:27:14,310
+For example, this bar here is saying
+among all the points where we had one
+
+1720
+00:27:14,310 --> 00:27:14,320
+among all the points where we had one
+ 
+
+1721
+00:27:14,320 --> 00:27:16,510
+among all the points where we had one
+bit of uncertainty, on average the
+
+1722
+00:27:16,510 --> 00:27:16,520
+bit of uncertainty, on average the
+ 
+
+1723
+00:27:16,520 --> 00:27:18,630
+bit of uncertainty, on average the
+number of new guesses required was about
+
+1724
+00:27:18,630 --> 00:27:18,640
+number of new guesses required was about
+ 
+
+1725
+00:27:18,640 --> 00:27:22,150
+number of new guesses required was about
+1.5.
+
+1726
+00:27:22,150 --> 00:27:22,160
+
+ 
+
+1727
+00:27:22,160 --> 00:27:24,070
+
+And the bar over here is saying among
+
+1728
+00:27:24,070 --> 00:27:24,080
+And the bar over here is saying among
+ 
+
+1729
+00:27:24,080 --> 00:27:25,470
+And the bar over here is saying among
+all of the different games where at some
+
+1730
+00:27:25,470 --> 00:27:25,480
+all of the different games where at some
+ 
+
+1731
+00:27:25,480 --> 00:27:27,430
+all of the different games where at some
+point the uncertainty was a little above
+
+1732
+00:27:27,430 --> 00:27:27,440
+point the uncertainty was a little above
+ 
+
+1733
+00:27:27,440 --> 00:27:29,310
+point the uncertainty was a little above
+four bits, which is like narrowing it
+
+1734
+00:27:29,310 --> 00:27:29,320
+four bits, which is like narrowing it
+ 
+
+1735
+00:27:29,320 --> 00:27:31,590
+four bits, which is like narrowing it
+down to 16 different possibilities, then
+
+1736
+00:27:31,590 --> 00:27:31,600
+down to 16 different possibilities, then
+ 
+
+1737
+00:27:31,600 --> 00:27:33,350
+down to 16 different possibilities, then
+on average it requires a little more
+
+1738
+00:27:33,350 --> 00:27:33,360
+on average it requires a little more
+ 
+
+1739
+00:27:33,360 --> 00:27:34,910
+on average it requires a little more
+than two guesses from that point
+
+1740
+00:27:34,910 --> 00:27:34,920
+than two guesses from that point
+ 
+
+1741
+00:27:34,920 --> 00:27:36,950
+than two guesses from that point
+forward. And from here I just did a
+
+1742
+00:27:36,950 --> 00:27:36,960
+forward. And from here I just did a
+ 
+
+1743
+00:27:36,960 --> 00:27:38,470
+forward. And from here I just did a
+regression to fit a function that seemed
+
+1744
+00:27:38,470 --> 00:27:38,480
+regression to fit a function that seemed
+ 
+
+1745
+00:27:38,480 --> 00:27:40,550
+regression to fit a function that seemed
+reasonable to this. And remember the
+
+1746
+00:27:40,550 --> 00:27:40,560
+reasonable to this. And remember the
+ 
+
+1747
+00:27:40,560 --> 00:27:42,470
+reasonable to this. And remember the
+whole point of doing any of that is so
+
+1748
+00:27:42,470 --> 00:27:42,480
+whole point of doing any of that is so
+ 
+
+1749
+00:27:42,480 --> 00:27:44,390
+whole point of doing any of that is so
+that we can quantify this intuition that
+
+1750
+00:27:44,390 --> 00:27:44,400
+that we can quantify this intuition that
+ 
+
+1751
+00:27:44,400 --> 00:27:46,110
+that we can quantify this intuition that
+the more information we gain from a
+
+1752
+00:27:46,110 --> 00:27:46,120
+the more information we gain from a
+ 
+
+1753
+00:27:46,120 --> 00:27:48,110
+the more information we gain from a
+word, the lower the expected score will
+
+1754
+00:27:48,110 --> 00:27:48,120
+word, the lower the expected score will
+ 
+
+1755
+00:27:48,120 --> 00:27:49,590
+word, the lower the expected score will
+be.
+
+1756
+00:27:49,590 --> 00:27:49,600
+be.
+ 
+
+1757
+00:27:49,600 --> 00:27:51,910
+be.
+So, with this as version 2.0, if we go
+
+1758
+00:27:51,910 --> 00:27:51,920
+So, with this as version 2.0, if we go
+ 
+
+1759
+00:27:51,920 --> 00:27:53,390
+So, with this as version 2.0, if we go
+back and we run the same set of
+
+1760
+00:27:53,390 --> 00:27:53,400
+back and we run the same set of
+ 
+
+1761
+00:27:53,400 --> 00:27:55,350
+back and we run the same set of
+simulations having it play against all
+
+1762
+00:27:55,350 --> 00:27:55,360
+simulations having it play against all
+ 
+
+1763
+00:27:55,360 --> 00:27:56,870
+simulations having it play against all
+2,315
+
+1764
+00:27:56,870 --> 00:27:56,880
+2,315
+ 
+
+1765
+00:27:56,880 --> 00:28:00,270
+2,315
+possible Wordle answers, how does it do?
+
+1766
+00:28:00,270 --> 00:28:00,280
+possible Wordle answers, how does it do?
+ 
+
+1767
+00:28:00,280 --> 00:28:01,550
+possible Wordle answers, how does it do?
+Well, in contrast to our first version,
+
+1768
+00:28:01,550 --> 00:28:01,560
+Well, in contrast to our first version,
+ 
+
+1769
+00:28:01,560 --> 00:28:02,870
+Well, in contrast to our first version,
+it's definitely better, which is
+
+1770
+00:28:02,870 --> 00:28:02,880
+it's definitely better, which is
+ 
+
+1771
+00:28:02,880 --> 00:28:04,630
+it's definitely better, which is
+reassuring. All said and done, the
+
+1772
+00:28:04,630 --> 00:28:04,640
+reassuring. All said and done, the
+ 
+
+1773
+00:28:04,640 --> 00:28:07,390
+reassuring. All said and done, the
+average is around 3.6. Although, unlike
+
+1774
+00:28:07,390 --> 00:28:07,400
+average is around 3.6. Although, unlike
+ 
+
+1775
+00:28:07,400 --> 00:28:08,990
+average is around 3.6. Although, unlike
+the first version, there are a couple
+
+1776
+00:28:08,990 --> 00:28:09,000
+the first version, there are a couple
+ 
+
+1777
+00:28:09,000 --> 00:28:10,670
+the first version, there are a couple
+times that it loses and requires more
+
+1778
+00:28:10,670 --> 00:28:10,680
+times that it loses and requires more
+ 
+
+1779
+00:28:10,680 --> 00:28:12,710
+times that it loses and requires more
+than six in this circumstance,
+
+1780
+00:28:12,710 --> 00:28:12,720
+than six in this circumstance,
+ 
+
+1781
+00:28:12,720 --> 00:28:13,990
+than six in this circumstance,
+presumably because there's times when
+
+1782
+00:28:13,990 --> 00:28:14,000
+presumably because there's times when
+ 
+
+1783
+00:28:14,000 --> 00:28:15,470
+presumably because there's times when
+it's making that trade-off to actually
+
+1784
+00:28:15,470 --> 00:28:15,480
+it's making that trade-off to actually
+ 
+
+1785
+00:28:15,480 --> 00:28:17,190
+it's making that trade-off to actually
+go for the goal rather than maximizing
+
+1786
+00:28:17,190 --> 00:28:17,200
+go for the goal rather than maximizing
+ 
+
+1787
+00:28:17,200 --> 00:28:18,830
+go for the goal rather than maximizing
+information.
+
+1788
+00:28:18,830 --> 00:28:18,840
+information.
+ 
+
+1789
+00:28:18,840 --> 00:28:21,990
+information.
+So, can we do better than 3.6?
+
+1790
+00:28:21,990 --> 00:28:22,000
+So, can we do better than 3.6?
+ 
+
+1791
+00:28:22,000 --> 00:28:23,710
+So, can we do better than 3.6?
+We definitely can. Now, I said at the
+
+1792
+00:28:23,710 --> 00:28:23,720
+We definitely can. Now, I said at the
+ 
+
+1793
+00:28:23,720 --> 00:28:25,670
+We definitely can. Now, I said at the
+start that it's most fun to try not
+
+1794
+00:28:25,670 --> 00:28:25,680
+start that it's most fun to try not
+ 
+
+1795
+00:28:25,680 --> 00:28:27,390
+start that it's most fun to try not
+incorporating the true list of Wordle
+
+1796
+00:28:27,390 --> 00:28:27,400
+incorporating the true list of Wordle
+ 
+
+1797
+00:28:27,400 --> 00:28:28,910
+incorporating the true list of Wordle
+answers into the way that it builds its
+
+1798
+00:28:28,910 --> 00:28:28,920
+answers into the way that it builds its
+ 
+
+1799
+00:28:28,920 --> 00:28:31,710
+answers into the way that it builds its
+model. But, if we do incorporate it, the
+
+1800
+00:28:31,710 --> 00:28:31,720
+model. But, if we do incorporate it, the
+ 
+
+1801
+00:28:31,720 --> 00:28:33,270
+model. But, if we do incorporate it, the
+best performance I could get was around
+
+1802
+00:28:33,270 --> 00:28:33,280
+best performance I could get was around
+ 
+
+1803
+00:28:33,280 --> 00:28:35,070
+best performance I could get was around
+3.43.
+
+1804
+00:28:35,070 --> 00:28:35,080
+3.43.
+ 
+
+1805
+00:28:35,080 --> 00:28:36,710
+3.43.
+So, if we try to get more sophisticated
+
+1806
+00:28:36,710 --> 00:28:36,720
+So, if we try to get more sophisticated
+ 
+
+1807
+00:28:36,720 --> 00:28:38,990
+So, if we try to get more sophisticated
+than just using word frequency data to
+
+1808
+00:28:38,990 --> 00:28:39,000
+than just using word frequency data to
+ 
+
+1809
+00:28:39,000 --> 00:28:40,990
+than just using word frequency data to
+choose this prior distribution, this
+
+1810
+00:28:40,990 --> 00:28:41,000
+choose this prior distribution, this
+ 
+
+1811
+00:28:41,000 --> 00:28:43,310
+choose this prior distribution, this
+3.43 probably gives a max at how good we
+
+1812
+00:28:43,310 --> 00:28:43,320
+3.43 probably gives a max at how good we
+ 
+
+1813
+00:28:43,320 --> 00:28:44,550
+3.43 probably gives a max at how good we
+could get with that, or at least how
+
+1814
+00:28:44,550 --> 00:28:44,560
+could get with that, or at least how
+ 
+
+1815
+00:28:44,560 --> 00:28:46,470
+could get with that, or at least how
+good I could get with that. That best
+
+1816
+00:28:46,470 --> 00:28:46,480
+good I could get with that. That best
+ 
+
+1817
+00:28:46,480 --> 00:28:48,350
+good I could get with that. That best
+performance essentially just uses the
+
+1818
+00:28:48,350 --> 00:28:48,360
+performance essentially just uses the
+ 
+
+1819
+00:28:48,360 --> 00:28:50,110
+performance essentially just uses the
+ideas that I've been talking about here,
+
+1820
+00:28:50,110 --> 00:28:50,120
+ideas that I've been talking about here,
+ 
+
+1821
+00:28:50,120 --> 00:28:51,470
+ideas that I've been talking about here,
+but it goes a little farther. Like it
+
+1822
+00:28:51,470 --> 00:28:51,480
+but it goes a little farther. Like it
+ 
+
+1823
+00:28:51,480 --> 00:28:52,550
+but it goes a little farther. Like it
+does a search for the expected
+
+1824
+00:28:52,550 --> 00:28:52,560
+does a search for the expected
+ 
+
+1825
+00:28:52,560 --> 00:28:54,350
+does a search for the expected
+information two steps forward rather
+
+1826
+00:28:54,350 --> 00:28:54,360
+information two steps forward rather
+ 
+
+1827
+00:28:54,360 --> 00:28:56,390
+information two steps forward rather
+than just one. Originally I was planning
+
+1828
+00:28:56,390 --> 00:28:56,400
+than just one. Originally I was planning
+ 
+
+1829
+00:28:56,400 --> 00:28:57,910
+than just one. Originally I was planning
+on talking more about that, but I
+
+1830
+00:28:57,910 --> 00:28:57,920
+on talking more about that, but I
+ 
+
+1831
+00:28:57,920 --> 00:28:59,470
+on talking more about that, but I
+realize we've actually gone quite long
+
+1832
+00:28:59,470 --> 00:28:59,480
+realize we've actually gone quite long
+ 
+
+1833
+00:28:59,480 --> 00:29:01,230
+realize we've actually gone quite long
+as it is. The one thing I'll say is
+
+1834
+00:29:01,230 --> 00:29:01,240
+as it is. The one thing I'll say is
+ 
+
+1835
+00:29:01,240 --> 00:29:02,630
+as it is. The one thing I'll say is
+after doing this two-step search and
+
+1836
+00:29:02,630 --> 00:29:02,640
+after doing this two-step search and
+ 
+
+1837
+00:29:02,640 --> 00:29:04,470
+after doing this two-step search and
+then running a couple sample simulations
+
+1838
+00:29:04,470 --> 00:29:04,480
+then running a couple sample simulations
+ 
+
+1839
+00:29:04,480 --> 00:29:06,670
+then running a couple sample simulations
+in the top candidates, so far for me at
+
+1840
+00:29:06,670 --> 00:29:06,680
+in the top candidates, so far for me at
+ 
+
+1841
+00:29:06,680 --> 00:29:08,390
+in the top candidates, so far for me at
+least it's looking like crane is the
+
+1842
+00:29:08,390 --> 00:29:08,400
+least it's looking like crane is the
+ 
+
+1843
+00:29:08,400 --> 00:29:10,750
+least it's looking like crane is the
+best opener. Who would have guessed?
+
+1844
+00:29:10,750 --> 00:29:10,760
+best opener. Who would have guessed?
+ 
+
+1845
+00:29:10,760 --> 00:29:12,830
+best opener. Who would have guessed?
+Also, if you use the true word list to
+
+1846
+00:29:12,830 --> 00:29:12,840
+Also, if you use the true word list to
+ 
+
+1847
+00:29:12,840 --> 00:29:14,830
+Also, if you use the true word list to
+determine your space of possibilities,
+
+1848
+00:29:14,830 --> 00:29:14,840
+determine your space of possibilities,
+ 
+
+1849
+00:29:14,840 --> 00:29:16,470
+determine your space of possibilities,
+then the uncertainty you start with is a
+
+1850
+00:29:16,470 --> 00:29:16,480
+then the uncertainty you start with is a
+ 
+
+1851
+00:29:16,480 --> 00:29:18,710
+then the uncertainty you start with is a
+little over 11 bits. And it turns out
+
+1852
+00:29:18,710 --> 00:29:18,720
+little over 11 bits. And it turns out
+ 
+
+1853
+00:29:18,720 --> 00:29:20,270
+little over 11 bits. And it turns out
+just from a brute force search, the
+
+1854
+00:29:20,270 --> 00:29:20,280
+just from a brute force search, the
+ 
+
+1855
+00:29:20,280 --> 00:29:22,670
+just from a brute force search, the
+maximum possible expected information
+
+1856
+00:29:22,670 --> 00:29:22,680
+maximum possible expected information
+ 
+
+1857
+00:29:22,680 --> 00:29:25,310
+maximum possible expected information
+after the first two guesses is around 10
+
+1858
+00:29:25,310 --> 00:29:25,320
+after the first two guesses is around 10
+ 
+
+1859
+00:29:25,320 --> 00:29:26,390
+after the first two guesses is around 10
+bits.
+
+1860
+00:29:26,390 --> 00:29:26,400
+bits.
+ 
+
+1861
+00:29:26,400 --> 00:29:28,870
+bits.
+Which suggests that best case scenario,
+
+1862
+00:29:28,870 --> 00:29:28,880
+Which suggests that best case scenario,
+ 
+
+1863
+00:29:28,880 --> 00:29:30,630
+Which suggests that best case scenario,
+after your first two guesses with
+
+1864
+00:29:30,630 --> 00:29:30,640
+after your first two guesses with
+ 
+
+1865
+00:29:30,640 --> 00:29:32,630
+after your first two guesses with
+perfectly optimal play, you'll be left
+
+1866
+00:29:32,630 --> 00:29:32,640
+perfectly optimal play, you'll be left
+ 
+
+1867
+00:29:32,640 --> 00:29:34,990
+perfectly optimal play, you'll be left
+with around one bit of uncertainty.
+
+1868
+00:29:34,990 --> 00:29:35,000
+with around one bit of uncertainty.
+ 
+
+1869
+00:29:35,000 --> 00:29:36,390
+with around one bit of uncertainty.
+Which is the same as being down to two
+
+1870
+00:29:36,390 --> 00:29:36,400
+Which is the same as being down to two
+ 
+
+1871
+00:29:36,400 --> 00:29:38,350
+Which is the same as being down to two
+possible guesses. But I think it's fair
+
+1872
+00:29:38,350 --> 00:29:38,360
+possible guesses. But I think it's fair
+ 
+
+1873
+00:29:38,360 --> 00:29:39,870
+possible guesses. But I think it's fair
+and probably pretty conservative to say
+
+1874
+00:29:39,870 --> 00:29:39,880
+and probably pretty conservative to say
+ 
+
+1875
+00:29:39,880 --> 00:29:41,670
+and probably pretty conservative to say
+that you could never possibly write an
+
+1876
+00:29:41,670 --> 00:29:41,680
+that you could never possibly write an
+ 
+
+1877
+00:29:41,680 --> 00:29:43,430
+that you could never possibly write an
+algorithm that gets this average as low
+
+1878
+00:29:43,430 --> 00:29:43,440
+algorithm that gets this average as low
+ 
+
+1879
+00:29:43,440 --> 00:29:45,190
+algorithm that gets this average as low
+as three. Because with the words
+
+1880
+00:29:45,190 --> 00:29:45,200
+as three. Because with the words
+ 
+
+1881
+00:29:45,200 --> 00:29:46,830
+as three. Because with the words
+available to you, there's simply not
+
+1882
+00:29:46,830 --> 00:29:46,840
+available to you, there's simply not
+ 
+
+1883
+00:29:46,840 --> 00:29:48,870
+available to you, there's simply not
+room to get enough information after
+
+1884
+00:29:48,870 --> 00:29:48,880
+room to get enough information after
+ 
+
+1885
+00:29:48,880 --> 00:29:50,910
+room to get enough information after
+only two steps to be able to guarantee
+
+1886
+00:29:50,910 --> 00:29:50,920
+only two steps to be able to guarantee
+ 
+
+1887
+00:29:50,920 --> 00:29:52,310
+only two steps to be able to guarantee
+the answer in the third slot every
+
+1888
+00:29:52,310 --> 00:29:52,320
+the answer in the third slot every
+ 
+
+1889
+00:29:52,320 --> 00:29:55,840
+the answer in the third slot every
+single time without fail.
+
