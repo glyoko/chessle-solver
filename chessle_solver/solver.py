@@ -83,11 +83,23 @@ class Solver:
         return best_guess(candidates, remaining)
 
     def play(self, secret: tuple[str, ...]) -> list[tuple[str, ...]]:
-        """Play one game against `secret`. Returns the list of guesses made."""
+        """
+        Play one game against `secret`. Returns the list of guesses made.
+
+        If `secret` isn't actually in this solver's answer pool (it can
+        legitimately be tested against any secret, not just ones drawn from
+        its own pool -- e.g. a real live puzzle our corpus doesn't cover),
+        the remaining-candidates set can be filtered down to nothing without
+        ever having guessed correctly. When that happens there's no viable
+        next guess, so we stop rather than crash; the caller can tell this
+        happened because the last guess (if any) won't equal `secret`.
+        """
         remaining = dict(self.answer_pool)
         guesses_made: list[tuple[str, ...]] = []
         for turn in range(1, self.max_guesses + 1):
             guess, _ = self.choose_guess(turn, remaining)
+            if guess is None:
+                break
             guesses_made.append(guess)
             if guess == secret:
                 return guesses_made
