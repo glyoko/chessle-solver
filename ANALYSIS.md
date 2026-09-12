@@ -101,14 +101,18 @@ starting position — computationally unbounded for our purposes, and mostly
 made of guesses no rational player would ever try (nobody's opening guess
 is `a4 a5 a3 a6 h4 h5`).
 
-**Simplification:** guesses (like answers) are restricted to prefixes that
-appear in the same opening corpus. This is the same kind of simplification
-Wordle solvers already make (a "valid guess" is still restricted to an
-actual dictionary, not literally any 5-letter string) — it just needed to
-be stated explicitly here because unlike Wordle, Chessle's real UI doesn't
-enforce this restriction on the player. It means the bot below can only
-ever recommend openings that are themselves book theory, which in practice
-is exactly what a strong human player would do too.
+**Initial simplification (later revisited in §8):** guesses were first
+restricted to prefixes that appear in the same opening corpus, the same
+kind of simplification Wordle solvers already make (a "valid guess" is
+still restricted to an actual dictionary, not literally any 5-letter
+string). But this analogy breaks down in one important way: Wordle's
+guess dictionary (~13,000 words) is *deliberately larger* than its answer
+list (~2,315), specifically so a guess can be a good letter-splitter
+without needing to be a plausible answer itself (`slate`, `crane`, `tares`
+are guesses precisely *because* they split information well, not because
+they're likely Wordle answers). Restricting Chessle's guesses to the
+answer corpus collapses that distinction entirely — it rules out exactly
+the kind of high-information "probe" move Wordle relies on. §8 fixes this.
 
 ## 5. Version 1 vs Version 2, exactly like the video
 
@@ -131,7 +135,7 @@ repeat. No separate endgame heuristic was added (the video's "expected
 score" refinement, which trades pure information gain for probability of
 just winning soon, would be a natural next step here too — see §7).
 
-## 6. Results
+## 6. Results (corpus-restricted guesses)
 
 Run via `python3 main.py both`. Two metrics are reported per run because
 the two solvers optimize for *different* assumed worlds: "secrets equally
@@ -163,16 +167,80 @@ under exactly that assumption), but under the popularity-weighted world —
 the one that's actually supposed to resemble how Chessle picks answers — v2
 wins clearly, cutting Normal-mode games from 3.54 to 2.74 average guesses.
 
-**The "slate"/"crane" answer:** for Normal difficulty, the recommended
-opener is **`d4 Nf6 Nf3 e6 Nc3 d5`** (a Queen's Gambit / Nimzo-ish setup) —
-under the v1 uniform model it's instead **`e4 e5 Nf3 Nf6 d4 d5`** (a
-symmetric open-game mainline). Interestingly, at Expert (10-ply) depth both
-models agree on the same opener: **`c4 c5 Nf3 Nc6 Nc3 Nf6 e3 e6 d4 d5`**
-(a Symmetrical English) — likely because at that depth the corpus itself
-is sparser and dominated by a few very well-attested long mainlines, so
-"most informative" and "most popular" converge on the same line.
+These openers are, however, only optimal *among real named openings* —
+see §8, which lifts that restriction and finds something better in every
+case.
 
-## 7. Limitations / natural next steps
+## 8. Beating "real openings only": probing with off-book legal moves
+
+§4 flagged a real gap: restricting guesses to the answer corpus throws
+away exactly the kind of information-maximizing "probe" move Wordle relies
+on (`slate`/`crane`/`tares` aren't likely Wordle answers — they're guesses
+*because* they split letters well). Chessle's true guess space is "any
+legal move sequence," which is far too large to brute-force directly
+(~30 legal moves per ply → roughly `30^6` to `30^10` sequences).
+
+**The workaround** (`chessle_solver/probe.py`): solve an easier, *relaxed*
+version of the problem first, then filter for the real constraint.
+
+1. For each ply position independently, ignore both legality and
+   cross-position correlation. Look at the answer pool's marginal
+   distribution of moves at just that one slot, and rank candidate moves
+   by how close to a 50/50 split they produce there (binary entropy
+   `-[p·log2(p) + (1-p)·log2(1-p))]`). This is *not* the real Chessle
+   objective — it drops the yellow/duplicate cross-referencing that ties
+   positions together (which matters more here than in Wordle, since
+   opening theory transposes constantly: the same move often appears at
+   different plies across different move-orders) — but it's cheap.
+2. Enumerate *combinations* of per-position picks in strictly
+   non-increasing order of their relaxed total score (a standard
+   best-first search over sorted per-position candidate lists — same
+   family of technique as k-shortest-path search).
+3. For each combination, in that order, check real chess legality (via
+   `python-chess`). Whenever one is legal, score it with the *real* entropy
+   function (not the relaxed proxy that generated it) and keep whichever
+   legal sequence scores highest. The relaxed ranking only decides search
+   order; it never picks the winner.
+
+Because step 1 optimizes a different, easier objective than true entropy,
+this is a strong *candidate*, not a proof of the global optimum — a bigger
+search budget can (and did) turn up something better.
+
+**Results**, `python3 main.py both --probe-budget 300000`:
+
+| Mode | Solver | Corpus-restricted opener (entropy) | Best legal probe found (entropy) | Named opening? | Combos scanned / legal |
+|---|---|---|---|---|---|
+| Normal | v1 | `e4 e5 Nf3 Nf6 d4 d5` (6.54 bits) | `d4 e5 Nf3 Nf6 Nc3 d5` (**6.74 bits**) | No | 20,000 / 4,652 |
+| Normal | v2 | `d4 Nf6 Nf3 e6 Nc3 d5` (5.74 bits) | `d4 d5 Nf3 e6 Nc3 Nf6` (**5.78 bits**) | No | 20,000 / 4,419 |
+| Expert | v1 | `c4 c5 Nf3 Nc6 Nc3 Nf6 e3 e6 d4 d5` (8.01 bits) | `d4 e5 Nf3 Nc6 Nc3 Nf6 e3 Be7 d5 O-O` (**8.05 bits**) | No | 300,000 / 668 |
+| Expert | v2 | `c4 c5 Nf3 Nc6 Nc3 Nf6 e3 e6 d4 d5` (7.16 bits) | `d4 e5 c4 Nc6 Nc3 Nf6 d5 Be7 Nf3 O-O` (**7.18 bits**) | No | 300,000 / 593 |
+
+**The intuition was right**: in all four cases the winning sequence is
+confirmed (checked directly against `openings_corpus.tsv`) to be **not** a
+named opening at all — it's a legal splice that no single real line plays,
+and it beats every actual named opening in the corpus at maximizing
+information. The Wordle analogy holds: the best Chessle opener, like the
+best Wordle opener, doesn't need to be a plausible answer.
+
+Two honest caveats on how far this goes:
+
+- **The margins are small** (6.54→6.74, 5.74→5.78, 8.01→8.05, 7.16→7.18
+  bits) — a real, confirmed improvement, not a blowout. The corpus of real
+  openings turns out to already be quite well information-optimized,
+  which makes sense: popular openings are popular partly *because* they
+  lead to sharply different resulting positions.
+- **Legal sequences get rare fast as depth grows.** At 10 plies, only
+  roughly 1 in 500 scanned combinations turned out to be legal at all, and
+  the winning one wasn't found until deep into a 300,000-combination scan
+  (attempt #194,190 for v1). A larger budget might still find something
+  better; this is a budget-limited heuristic search, not an exhaustive
+  proof of the true maximum.
+- This section only re-optimizes the **opening guess**. The full-game
+  simulation in §6 still uses the corpus-restricted solver for turns 2+ —
+  extending per-turn probing to the (much smaller, rapidly shrinking)
+  candidate pools after guess 1 is a natural next step, not yet done.
+
+## 9. Limitations / natural next steps
 
 - **Popularity weight is a proxy, not real data.** Branch-count in a named
   ECO tree correlates with "well-known" but isn't a real frequency
@@ -186,8 +254,8 @@ is sparser and dominated by a few very well-attested long mainlines, so
   implemented here; would slot into `Solver.choose_guess`.
 - **No multi-step lookahead.** The video's best result used a two-guess
   lookahead search; this bot only ever optimizes the immediate guess.
-- **Guess space still corpus-restricted** (§4) — a truly unrestricted
-  legal-move guesser is a different (much larger) search problem.
+- **Probing (§8) is opener-only and budget-limited**, not a full
+  replacement for the corpus-restricted solver used at every turn.
 
 ## Code layout
 
@@ -197,9 +265,13 @@ chessle_solver/
   corpus.py                  # load + collapse the corpus into weighted prefix pools
   match.py                   # Chessle's exact feedback algorithm
   entropy.py                 # information/entropy calculations
-  solver.py                  # entropy-maximizing guess selection + game loop
+  solver.py                  # entropy-maximizing guess selection + game loop (corpus-restricted)
+  legal.py                   # real chess-legality check (python-chess)
+  probe.py                   # relaxed-then-legal-filtered search for off-book probe guesses (§8)
   simulate.py                # run the solver across every candidate answer
-main.py                      # CLI: prints best openers + simulation results
+main.py                      # CLI: prints best openers (corpus + probe) + simulation results
 ```
 
-Run it: `python3 main.py both` (or `normal` / `expert`).
+Run it: `python3 main.py both` (or `normal` / `expert`, optionally
+`--probe-budget N`, default 20,000 — pass a larger budget like 300,000 for
+Expert mode, since legal sequences are much rarer at 10 plies).
