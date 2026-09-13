@@ -3,14 +3,18 @@ CLI entry point: find the best opening guess and simulate full games for
 Chessle's Normal (6-ply) and Expert (10-ply) difficulties, both with a
 uniform prior over answers (v1) and a popularity-weighted prior (v2).
 
-Also runs two off-book probe searches alongside the corpus-restricted
-search, since Chessle's real guess space is "any legal move sequence," not
-just real named openings -- see ANALYSIS.md section 8:
+Since Chessle's real guess space is "any legal move sequence," not just
+real named openings (see ANALYSIS.md section 8), the Solver itself now
+searches two off-book probes for its turn-1 guess and uses whichever
+option has the highest true entropy -- the corpus-restricted opener, or
+the legal-by-construction tree-search probe:
   - chessle_solver.probe: relaxed per-ply ranking, filtered for legality
     after the fact (fast, but wastes most of its budget on illegal
-    sequences since the ranking has no notion of chess legality).
+    sequences since the ranking has no notion of chess legality) -- run
+    here only for comparison, not fed into the Solver.
   - chessle_solver.tree_probe: beam search over the real game tree, legal
-    by construction (every candidate scored is actually legal).
+    by construction (every candidate scored is actually legal) -- this is
+    the one Solver.opening_guess() actually uses when it beats the corpus.
 
 Usage: python3 main.py [normal|expert|both] [--probe-budget N] [--beam-width N]
 """
@@ -23,7 +27,6 @@ from chessle_solver import (
     Solver,
     build_prefix_pool,
     find_best_legal_probe,
-    find_best_legal_probe_tree,
     load_all_entries,
     max_possible_entropy,
     simulate,
@@ -41,15 +44,27 @@ def run(depth: int, label: str, probe_budget: int, beam_width: int):
     print(f"Max possible entropy at this pool size: {max_possible_entropy(uniform_pool):.2f} bits")
 
     solvers = {
-        "v1 (uniform prior)": (uniform_pool, Solver(guess_pool, uniform_pool)),
-        "v2 (weighted prior)": (weighted_pool, Solver(guess_pool, weighted_pool)),
+        "v1 (uniform prior)": (
+            uniform_pool,
+            Solver(guess_pool, uniform_pool, tree_probe_beam_width=beam_width),
+        ),
+        "v2 (weighted prior)": (
+            weighted_pool,
+            Solver(guess_pool, weighted_pool, tree_probe_beam_width=beam_width),
+        ),
     }
 
     for name, (pool, solver) in solvers.items():
         t0 = time.time()
+        corpus_opener, corpus_h = solver.corpus_only_opener()
         opener, h = solver.opening_guess()
+        is_probe = solver.opener_is_off_book_probe()
+
         print(f"\n-- {name} --")
-        print(f"Best opening guess (real named openings only): {' '.join(opener)}  (entropy {h:.2f} bits)")
+        print(
+            f"Best opening guess (real named openings only): {' '.join(corpus_opener)}"
+            f"  (entropy {corpus_h:.2f} bits)"
+        )
 
         probe_report = find_best_legal_probe(pool, depth, max_attempts=probe_budget)
         if probe_report.best:
@@ -60,26 +75,24 @@ def run(depth: int, label: str, probe_budget: int, beam_width: int):
                 f"{probe_report.legal_found} legal): {' '.join(b.moves)}  (entropy {b.true_entropy:.2f} bits"
                 f"{', a REAL named opening' if is_named else ', NOT a named opening'})"
             )
-            if b.true_entropy > h:
-                print("  -> probe beats the corpus-restricted opener.")
+            if b.true_entropy > corpus_h:
+                print("  -> relaxed probe beats the corpus-restricted opener.")
         else:
             print(f"Best legal probe: none found within budget ({probe_budget} scanned)")
 
-        tree_report = find_best_legal_probe_tree(pool, depth, beam_width=beam_width)
-        if tree_report.best:
+        tree_report = solver.tree_probe_report()
+        if tree_report and tree_report.best:
             tb = tree_report.best
-            is_named = tb.moves in weighted_pool
             print(
                 f"Best tree-search probe (beam={beam_width}, {tree_report.nodes_expanded} legal "
-                f"nodes scored): {' '.join(tb.moves)}  (entropy {tb.true_entropy:.2f} bits"
-                f"{', a REAL named opening' if is_named else ', NOT a named opening'})"
+                f"nodes scored): {' '.join(tb.moves)}  (entropy {tb.true_entropy:.2f} bits, "
+                f"{'a REAL named opening' if tb.moves in weighted_pool else 'NOT a named opening'})"
             )
-            if tb.true_entropy > h:
-                print("  -> tree probe beats the corpus-restricted opener.")
-            if probe_report.best and tb.true_entropy > probe_report.best.true_entropy:
-                print("  -> tree probe beats the relaxed-ranking probe too.")
-        else:
-            print("Best tree-search probe: beam died out before reaching full depth")
+
+        print(
+            f"Solver's actual turn-1 guess: {' '.join(opener)}  (entropy {h:.2f} bits"
+            f"{', OFF-BOOK -- beats every real opening in the corpus' if is_probe else ', same as the corpus opener above'})"
+        )
 
         # Test set is always every distinct candidate; what changes is how
         # much we weight each one when averaging, i.e. what we assume the

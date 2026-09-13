@@ -18,11 +18,25 @@ later turns we search only the *remaining candidate answers* rather than
 the full guess pool, purely to keep runtime tractable -- entropy is still
 computed correctly over the full remaining-answer distribution, we're just
 narrowing which candidate guesses get considered.
+
+Opener off-book search: the corpus-only restriction above throws away
+exactly the kind of high-information "probe" guess that doesn't need to be
+a plausible answer itself (see ANALYSIS.md section 8) -- confirmed to
+matter in practice at Expert depth, where a legal-but-unnamed sequence
+found by the tree-search beam search (tree_probe.py) has HIGHER true
+entropy than the best real opening in the corpus. When `tree_probe_beam_width`
+is set, `opening_guess()` runs that search too and uses whichever of the
+two (corpus-best or tree-probe-best) has higher true entropy -- so the
+solver stays corpus-only when that happens to win (as it does at Normal
+depth) and switches to the off-book guess only when it's actually better
+(Expert depth). This only affects the turn-1 opener; later turns still
+search the corpus-restricted guess pool / remaining answers as before.
 """
 from __future__ import annotations
 
 from .entropy import entropy, pattern_distribution
 from .match import compare_sequences
+from .tree_probe import find_best_legal_probe_tree
 
 
 def filter_answers(
@@ -59,17 +73,54 @@ class Solver:
         answer_pool: dict[tuple[str, ...], float],
         max_guesses: int = 6,
         full_search_turns: int = 1,
+        tree_probe_beam_width: int | None = None,
     ):
         self.guess_pool = guess_pool
         self.answer_pool = answer_pool
         self.max_guesses = max_guesses
         self.full_search_turns = full_search_turns
+        self.tree_probe_beam_width = tree_probe_beam_width
         self._opener_cache: tuple[tuple[str, ...], float] | None = None
+        self._opener_is_probe: bool | None = None
+        self._corpus_opener_cache: tuple[tuple[str, ...], float] | None = None
+        self._tree_report = None
 
     def opening_guess(self) -> tuple[tuple[str, ...], float]:
         if self._opener_cache is None:
-            self._opener_cache = best_guess(self.guess_pool, self.answer_pool)
+            corpus_guess, corpus_h = best_guess(self.guess_pool, self.answer_pool)
+            self._corpus_opener_cache = (corpus_guess, corpus_h)
+            self._opener_cache = (corpus_guess, corpus_h)
+            self._opener_is_probe = False
+            if self.tree_probe_beam_width:
+                depth = len(next(iter(self.answer_pool)))
+                self._tree_report = find_best_legal_probe_tree(
+                    self.answer_pool, depth, beam_width=self.tree_probe_beam_width
+                )
+                if self._tree_report.best and self._tree_report.best.true_entropy > corpus_h:
+                    self._opener_cache = (
+                        self._tree_report.best.moves,
+                        self._tree_report.best.true_entropy,
+                    )
+                    self._opener_is_probe = True
         return self._opener_cache
+
+    def corpus_only_opener(self) -> tuple[tuple[str, ...], float]:
+        """The best opener restricted to real named openings, ignoring any
+        off-book tree-probe search -- for comparison against opening_guess()."""
+        self.opening_guess()
+        return self._corpus_opener_cache
+
+    def opener_is_off_book_probe(self) -> bool:
+        """True if opening_guess() picked the tree-probe result over the
+        corpus-restricted one. Only meaningful after opening_guess() has
+        been called at least once."""
+        self.opening_guess()
+        return bool(self._opener_is_probe)
+
+    def tree_probe_report(self):
+        """The TreeProbeReport computed during opening_guess() (None if
+        tree_probe_beam_width wasn't set, or opening_guess() hasn't run yet)."""
+        return self._tree_report
 
     def choose_guess(
         self, turn: int, remaining: dict[tuple[str, ...], float]
