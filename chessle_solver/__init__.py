@@ -12,6 +12,7 @@ from .match import compare_sequences
 from .probe import ProbeResult, ProbeSearchReport, find_best_legal_probe
 from .simulate import SimulationResult, simulate, weighted_average
 from .solver import Solver, best_guess, filter_answers
+from .tree_probe import TreeProbeReport, TreeProbeResult, find_best_legal_probe_tree
 
 __all__ = [
     "DEFAULT_CORPUS_PATH",
@@ -34,4 +35,7 @@ __all__ = [
     "Solver",
     "best_guess",
     "filter_answers",
+    "TreeProbeReport",
+    "TreeProbeResult",
+    "find_best_legal_probe_tree",
 ]

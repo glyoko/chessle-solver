@@ -249,36 +249,73 @@ against the **KingBase-enriched corpus** (§2):
 | Expert | v1 | `c4 c5 Nf3 Nc6 Nc3 Nf6 e3 e6 d4 d5` (**9.06 bits**) | `e4 e5 c4 d5 Nc3 Nf6 d4 g6 Nf3 Nc6` (9.01 bits) | No | 300,000 / 159 |
 | Expert | v2 | `c4 c5 Nf3 Nc6 Nc3 Nf6 e3 e6 d4 d5` (**8.41 bits**) | `d4 e5 c4 Nc6 Nc3 d5 e3 Nf6 Nf3 g6` (8.39 bits) | No | 300,000 / 332 |
 
-**The finding has flipped at Expert depth.** Before the corpus was enriched
-with KingBase continuations, off-book probing beat the corpus-restricted
-opener in all four cases (Normal *and* Expert). Now, with the much larger
-Expert pool (682→1,702 candidates), the corpus-restricted opener wins
-outright at Expert depth — the probe search, even with a 300,000-combination
-budget, tops out just short (9.01 vs. 9.06 bits, 8.39 vs. 8.41 bits). At
-Normal depth the probe still wins, by a similarly thin margin as before.
+**At Expert depth, this relaxed approach turned out to have a structural
+flaw, not just a budget problem.** Because step 1 scores each ply position
+completely independently, its top-ranked combinations systematically
+collide: the single most popular move at ply 2, 6, *and* 8 all turned out
+to be `Nf3` — asking White to move the same knight to the same square three
+separate times, which is illegal for a reason no per-ply ranking can see.
+That's why only ~1 in 1,900–5,000 combinations checked was legal at all
+(159–332 legal out of 300,000 scanned), and it's why the relaxed probe
+appeared to lose to the corpus-restricted opener at Expert depth in an
+earlier pass (9.01 vs. 9.06 bits) — not because off-book guessing stopped
+helping, but because this search method couldn't reliably reach the legal
+sequences that would have shown it still does.
 
-The likely explanation: a bigger, more representative candidate pool makes
-the *best real opening* itself a better information-splitter (more distinct
-branches to distinguish means a well-chosen real line already spreads
-probability mass well), which narrows the head start that off-book "not a
-real answer" guesses used to have. This is exactly the Wordle-vs-Chessle
-tension from §4 playing out empirically: the more the answer corpus looks
-like the *true* answer distribution, the smaller (though not necessarily
-zero) the edge from decoupling guesses from answers.
+### 8b. Fixing it: a legal-by-construction tree search
 
-Caveats on how far this goes:
+`chessle_solver/tree_probe.py` replaces the relaxed-then-filter design with
+a **beam search over the real game tree**: build the guess move by move,
+branching at each ply only into moves `python-chess` confirms are actually
+legal from the current position. Every candidate ever scored is legal —
+there's no filtering step because there's nothing to filter. It's scored
+with the same true entropy function throughout (against the answer pool
+truncated to the guess's current length), which also captures the
+green/yellow cross-referencing between plies that the relaxed ranking's
+per-position proxy drops. The one heuristic left is `beam_width`: how many
+of the best partial sequences to keep before extending further at each ply
+— a real, bounded approximation (a narrow beam can discard a prefix that
+would've led somewhere better), but a fundamentally different kind of
+approximation than "hope the legality-blind top-of-ranking happens to be
+legal."
 
-- **The margins are thin in both directions** — a few hundredths of a bit,
-  not a blowout either way. Treat "corpus wins at Expert now" as fragile to
-  exactly this budget and this corpus snapshot, not a settled result.
-- **Legal sequences get rare fast as depth grows.** At 10 plies, only
-  roughly 1 in 1,900–5,000 scanned combinations turned out to be legal at
-  all (159–332 legal out of 300,000 scanned) — a larger budget could still
-  turn up something that edges past the corpus opener again.
+**Results**, `python3 main.py both --beam-width 300`:
+
+| Mode | Solver | Corpus opener | Relaxed probe (§8, 20,000 scanned) | **Tree probe (beam=300)** | Legal nodes scored |
+|---|---|---|---|---|---|
+| Normal | v1 | 6.83 bits | `d4 e5 Nf3 Nf6 Nc3 d5` (6.97 bits) | `d4 e5 Nf3 Nf6 Nc3 d5` (**6.97 bits**, tied) | 32,828 |
+| Normal | v2 | 6.10 bits | `d4 e5 Nf3 Nf6 Nc3 d5` (6.15 bits) | `d4 e5 Nf3 Nf6 Nc3 d5` (**6.15 bits**, tied) | 32,325 |
+| Expert | v1 | 9.06 bits | `e4 e5 c4 d5 Nc3 Nf6 d4 g6 Nf3 Nc6` (9.01 bits) | `e4 d5 Nf3 e6 Nc3 Nf6 d4 c5 Bc4 Nc6` (**9.19 bits**) | 73,010 |
+| Expert | v2 | 8.41 bits | `d4 e5 c4 Nc6 Nc3 d5 e3 Nf6 Nf3 g6` (8.39 bits) | `e4 d5 Nf3 e6 Nc3 Nf6 d4 c5 Bc4 Nc6` (**8.51 bits**) | 72,051
+
+**This restores the original finding and sharpens it.** At Expert depth,
+off-book guessing *does* still beat every real named opening — the earlier
+"corpus wins at Expert" result was an artifact of the relaxed probe's
+legality-blindness, not a real property of the enriched corpus. The tree
+probe found a strictly better guess (9.19 vs. 9.06 bits for v1) while
+scoring **only ~73,000 candidates, every one of them legal** — a quarter of
+the relaxed probe's 300,000 mostly-illegal attempts from the earlier pass,
+and it still comes out ahead. At Normal depth, where legal sequences aren't
+nearly as rare to begin with, both methods land on the identical answer —
+the tree search's advantage is specifically in the legality-scarce regime
+(Expert's 10 plies), exactly where the relaxed approach's structural flaw
+bites hardest.
+
+Caveats:
+
+- **Beam search is still an approximation**, just a differently-shaped one:
+  `beam_width` (300 here) trades search thoroughness for compute the same
+  way `probe_budget` did for the relaxed method, and a narrower beam can
+  discard a promising early prefix. A wider beam might still find something
+  better than 9.19/8.51 bits; there's no proof this is the global optimum.
 - This section only re-optimizes the **opening guess**. The full-game
   simulation in §6 still uses the corpus-restricted solver for turns 2+ —
-  extending per-turn probing to the (much smaller, rapidly shrinking)
+  extending tree-based probing to the (much smaller, rapidly shrinking)
   candidate pools after guess 1 is a natural next step, not yet done.
+- `probe.py` (the relaxed method) is kept in the codebase for comparison
+  (`main.py` runs both side by side) rather than deleted, since it's a
+  useful illustration of why legality-aware search structure matters, not
+  just search volume.
 
 ## 9. Limitations / natural next steps
 
@@ -294,24 +331,28 @@ Caveats on how far this goes:
   implemented here; would slot into `Solver.choose_guess`.
 - **No multi-step lookahead.** The video's best result used a two-guess
   lookahead search; this bot only ever optimizes the immediate guess.
-- **Probing (§8) is opener-only and budget-limited**, not a full
+- **Probing (§8) is opener-only and beam/budget-limited**, not a full
   replacement for the corpus-restricted solver used at every turn.
 
 ## Code layout
 
 ```
 openings_corpus.tsv          # the "alphabet": 3,810 named opening lines (ECO A-E)
+kingbase_extensions.tsv      # real-game continuations for corpus dead-ends (§2)
 chessle_solver/
   corpus.py                  # load + collapse the corpus into weighted prefix pools
+  dead_ends.py                # find named-opening prefixes with no entry reaching target depth
   match.py                   # Chessle's exact feedback algorithm
   entropy.py                 # information/entropy calculations
   solver.py                  # entropy-maximizing guess selection + game loop (corpus-restricted)
   legal.py                   # real chess-legality check (python-chess)
   probe.py                   # relaxed-then-legal-filtered search for off-book probe guesses (§8)
+  tree_probe.py               # legal-by-construction beam search over the real game tree (§8b)
   simulate.py                # run the solver across every candidate answer
-main.py                      # CLI: prints best openers (corpus + probe) + simulation results
+main.py                      # CLI: prints best openers (corpus + both probes) + simulation results
 ```
 
-Run it: `python3 main.py both` (or `normal` / `expert`, optionally
-`--probe-budget N`, default 20,000 — pass a larger budget like 300,000 for
-Expert mode, since legal sequences are much rarer at 10 plies).
+Run it: `python3 main.py both` (or `normal` / `expert`), optionally with
+`--probe-budget N` (default 20,000; the relaxed probe, §8) and
+`--beam-width N` (default 200; the tree probe, §8b — 300 was used for the
+results above and took ~11 minutes total for both modes).
