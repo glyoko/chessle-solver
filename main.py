@@ -19,7 +19,7 @@ from chessle_solver import (
     Solver,
     build_prefix_pool,
     find_best_legal_probe,
-    load_entries,
+    load_all_entries,
     max_possible_entropy,
     simulate,
     weighted_average,
@@ -27,7 +27,7 @@ from chessle_solver import (
 
 
 def run(depth: int, label: str, probe_budget: int):
-    entries = load_entries()
+    entries = load_all_entries()
     weighted_pool = build_prefix_pool(depth, entries=entries)
     uniform_pool = {moves: 1 for moves in weighted_pool}
     guess_pool = list(weighted_pool.keys())

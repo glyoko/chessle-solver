@@ -1,4 +1,11 @@
-from .corpus import DEFAULT_CORPUS_PATH, OpeningEntry, build_prefix_pool, load_entries
+from .corpus import (
+    DEFAULT_CORPUS_PATH,
+    DEFAULT_EXTENSIONS_PATH,
+    OpeningEntry,
+    build_prefix_pool,
+    load_all_entries,
+    load_entries,
+)
 from .entropy import entropy, max_possible_entropy, pattern_distribution
 from .legal import is_legal_sequence
 from .match import compare_sequences
@@ -8,8 +15,10 @@ from .solver import Solver, best_guess, filter_answers
 
 __all__ = [
     "DEFAULT_CORPUS_PATH",
+    "DEFAULT_EXTENSIONS_PATH",
     "OpeningEntry",
     "build_prefix_pool",
+    "load_all_entries",
     "load_entries",
     "entropy",
     "max_possible_entropy",
