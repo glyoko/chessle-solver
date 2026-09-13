@@ -73,6 +73,32 @@ Chessle's real list is ever recovered, or a real-game-frequency database is
 preferred instead, swap in a new loader that returns the same dict shape —
 nothing else changes.
 
+### Closing a real corpus gap with real-game data
+
+Testing the solver against a live puzzle exposed a genuine hole: some named
+opening lines (e.g. the Bird Opening family, ECO A03) have no entry that
+reaches 10 plies at all under any name — the named theory tree "dead-ends"
+early — yet Chessle still generated a full 10-ply puzzle from that family.
+So Chessle's answer tree extends past where ECO naming stops.
+
+The first fix attempted was Stockfish: extend each dead-end with the
+engine's own top move. This *didn't* reproduce the real puzzle's
+continuation (the engine chose `3. e3` where the actual Chessle answer
+played `3. g3`) — good evidence Chessle's tree isn't engine-generated, and
+this approach was abandoned.
+
+The fix that worked: mine the [KingBase 2018](https://archive.org/details/KingBase2018)
+database (~2M real games by 2000+ ELO players, 1990–2018) for the single
+most common real continuation actually played from each dead-end prefix
+(`scripts/build_kingbase_extensions.py`, output saved to
+`kingbase_extensions.tsv`, same shape as the main corpus plus a `weight`
+column). This exactly reproduced the live puzzle's answer (matched against
+175 real KingBase games), and the full solver now wins that live puzzle in
+2 guesses. `chessle_solver/corpus.py:load_all_entries()` transparently
+concatenates both files — `kingbase_extensions.tsv` is optional and
+silently skipped if absent, so this is a genuine example of the swap-in
+architecture paying off, not a special case bolted on top of it.
+
 ## 3. The entropy math (unchanged from Wordle)
 
 Same definitions as the video, just with "move" standing in for "letter"
@@ -143,33 +169,38 @@ likely" tests every candidate line once, unweighted; "secrets weighted by
 popularity" re-scores the same games under the v2 popularity prior — the
 fairer test of what the popularity weighting actually buys you.
 
-### Normal (6-ply guesses, 652 distinct candidates)
+### Normal (6-ply guesses, 1,024 distinct candidates)
 
-Max possible entropy at this pool size: 9.35 bits.
-
-| Solver | Best opening guess | Opener entropy | Avg guesses (uniform test) | Avg guesses (weighted test) |
-|---|---|---|---|---|
-| v1 (uniform prior) | `e4 e5 Nf3 Nf6 d4 d5` | 6.54 bits | 3.193 | 3.540 |
-| v2 (weighted prior) | `d4 Nf6 Nf3 e6 Nc3 d5` | 5.74 bits | 3.218 | **2.740** |
-
-### Expert (10-ply guesses, 682 distinct candidates)
-
-Max possible entropy at this pool size: 9.41 bits.
+Max possible entropy at this pool size: 10.00 bits.
 
 | Solver | Best opening guess | Opener entropy | Avg guesses (uniform test) | Avg guesses (weighted test) |
 |---|---|---|---|---|
-| v1 (uniform prior) | `c4 c5 Nf3 Nc6 Nc3 Nf6 e3 e6 d4 d5` | 8.01 bits | 2.603 | 2.997 |
-| v2 (weighted prior) | `c4 c5 Nf3 Nc6 Nc3 Nf6 e3 e6 d4 d5` | 7.16 bits | 2.614 | **2.561** |
+| v1 (uniform prior) | `e4 e5 Nf3 Nf6 d4 d5` | 6.83 bits | 3.227 | 3.486 |
+| v2 (weighted prior) | `d4 Nf6 Nf3 e6 Nc3 d5` | 6.10 bits | 3.245 | **2.853** |
+
+### Expert (10-ply guesses, 1,702 distinct candidates)
+
+Max possible entropy at this pool size: 10.73 bits.
+
+| Solver | Best opening guess | Opener entropy | Avg guesses (uniform test) | Avg guesses (weighted test) |
+|---|---|---|---|---|
+| v1 (uniform prior) | `c4 c5 Nf3 Nc6 Nc3 Nf6 e3 e6 d4 d5` | 9.06 bits | 2.612 | 2.825 |
+| v2 (weighted prior) | `c4 c5 Nf3 Nc6 Nc3 Nf6 e3 e6 d4 d5` | 8.41 bits | 2.621 | **2.611** |
 
 This is the same pattern the video found: v1 has slightly *better* raw
 average against a uniform test set (it's purpose-built to maximize entropy
 under exactly that assumption), but under the popularity-weighted world —
 the one that's actually supposed to resemble how Chessle picks answers — v2
-wins clearly, cutting Normal-mode games from 3.54 to 2.74 average guesses.
+wins clearly.
+
+(These numbers reflect the KingBase-enriched corpus — see §2 — which grew
+the candidate pools considerably from an earlier ECO-only pass: Normal
+652→1,024, Expert 682→1,702. Real answers that used to fall outside the
+corpus, like today's Bird Opening puzzle, are now reachable.)
 
 These openers are, however, only optimal *among real named openings* —
-see §8, which lifts that restriction and finds something better in every
-case.
+see §8, which lifts that restriction, though the picture there has changed
+too now that the corpus is richer.
 
 ## 8. Beating "real openings only": probing with off-book legal moves
 
@@ -206,35 +237,44 @@ Because step 1 optimizes a different, easier objective than true entropy,
 this is a strong *candidate*, not a proof of the global optimum — a bigger
 search budget can (and did) turn up something better.
 
-**Results**, `python3 main.py both --probe-budget 300000`:
+**Results**, `python3 main.py normal --probe-budget 20000` and
+`python3 main.py expert --probe-budget 300000` (larger Expert budget since
+legal sequences get much rarer at 10 plies — see caveats below), run
+against the **KingBase-enriched corpus** (§2):
 
 | Mode | Solver | Corpus-restricted opener (entropy) | Best legal probe found (entropy) | Named opening? | Combos scanned / legal |
 |---|---|---|---|---|---|
-| Normal | v1 | `e4 e5 Nf3 Nf6 d4 d5` (6.54 bits) | `d4 e5 Nf3 Nf6 Nc3 d5` (**6.74 bits**) | No | 20,000 / 4,652 |
-| Normal | v2 | `d4 Nf6 Nf3 e6 Nc3 d5` (5.74 bits) | `d4 d5 Nf3 e6 Nc3 Nf6` (**5.78 bits**) | No | 20,000 / 4,419 |
-| Expert | v1 | `c4 c5 Nf3 Nc6 Nc3 Nf6 e3 e6 d4 d5` (8.01 bits) | `d4 e5 Nf3 Nc6 Nc3 Nf6 e3 Be7 d5 O-O` (**8.05 bits**) | No | 300,000 / 668 |
-| Expert | v2 | `c4 c5 Nf3 Nc6 Nc3 Nf6 e3 e6 d4 d5` (7.16 bits) | `d4 e5 c4 Nc6 Nc3 Nf6 d5 Be7 Nf3 O-O` (**7.18 bits**) | No | 300,000 / 593 |
+| Normal | v1 | `e4 e5 Nf3 Nf6 d4 d5` (6.83 bits) | `d4 e5 Nf3 Nf6 Nc3 d5` (**6.97 bits**) | No | 20,000 / 4,339 |
+| Normal | v2 | `d4 Nf6 Nf3 e6 Nc3 d5` (6.10 bits) | `d4 e5 Nf3 Nf6 Nc3 d5` (**6.15 bits**) | No | 20,000 / 4,306 |
+| Expert | v1 | `c4 c5 Nf3 Nc6 Nc3 Nf6 e3 e6 d4 d5` (**9.06 bits**) | `e4 e5 c4 d5 Nc3 Nf6 d4 g6 Nf3 Nc6` (9.01 bits) | No | 300,000 / 159 |
+| Expert | v2 | `c4 c5 Nf3 Nc6 Nc3 Nf6 e3 e6 d4 d5` (**8.41 bits**) | `d4 e5 c4 Nc6 Nc3 d5 e3 Nf6 Nf3 g6` (8.39 bits) | No | 300,000 / 332 |
 
-**The intuition was right**: in all four cases the winning sequence is
-confirmed (checked directly against `openings_corpus.tsv`) to be **not** a
-named opening at all — it's a legal splice that no single real line plays,
-and it beats every actual named opening in the corpus at maximizing
-information. The Wordle analogy holds: the best Chessle opener, like the
-best Wordle opener, doesn't need to be a plausible answer.
+**The finding has flipped at Expert depth.** Before the corpus was enriched
+with KingBase continuations, off-book probing beat the corpus-restricted
+opener in all four cases (Normal *and* Expert). Now, with the much larger
+Expert pool (682→1,702 candidates), the corpus-restricted opener wins
+outright at Expert depth — the probe search, even with a 300,000-combination
+budget, tops out just short (9.01 vs. 9.06 bits, 8.39 vs. 8.41 bits). At
+Normal depth the probe still wins, by a similarly thin margin as before.
 
-Two honest caveats on how far this goes:
+The likely explanation: a bigger, more representative candidate pool makes
+the *best real opening* itself a better information-splitter (more distinct
+branches to distinguish means a well-chosen real line already spreads
+probability mass well), which narrows the head start that off-book "not a
+real answer" guesses used to have. This is exactly the Wordle-vs-Chessle
+tension from §4 playing out empirically: the more the answer corpus looks
+like the *true* answer distribution, the smaller (though not necessarily
+zero) the edge from decoupling guesses from answers.
 
-- **The margins are small** (6.54→6.74, 5.74→5.78, 8.01→8.05, 7.16→7.18
-  bits) — a real, confirmed improvement, not a blowout. The corpus of real
-  openings turns out to already be quite well information-optimized,
-  which makes sense: popular openings are popular partly *because* they
-  lead to sharply different resulting positions.
+Caveats on how far this goes:
+
+- **The margins are thin in both directions** — a few hundredths of a bit,
+  not a blowout either way. Treat "corpus wins at Expert now" as fragile to
+  exactly this budget and this corpus snapshot, not a settled result.
 - **Legal sequences get rare fast as depth grows.** At 10 plies, only
-  roughly 1 in 500 scanned combinations turned out to be legal at all, and
-  the winning one wasn't found until deep into a 300,000-combination scan
-  (attempt #194,190 for v1). A larger budget might still find something
-  better; this is a budget-limited heuristic search, not an exhaustive
-  proof of the true maximum.
+  roughly 1 in 1,900–5,000 scanned combinations turned out to be legal at
+  all (159–332 legal out of 300,000 scanned) — a larger budget could still
+  turn up something that edges past the corpus opener again.
 - This section only re-optimizes the **opening guess**. The full-game
   simulation in §6 still uses the corpus-restricted solver for turns 2+ —
   extending per-turn probing to the (much smaller, rapidly shrinking)
